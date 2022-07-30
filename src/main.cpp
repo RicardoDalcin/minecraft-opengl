@@ -2,51 +2,88 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <map>
 #include <string>
+#include <limits>
 #include <fstream>
 #include <sstream>
 
-// Headers das bibliotecas OpenGL
-#include <glad/glad.h>  // Criação de contexto OpenGL 3.3
-#include <GLFW/glfw3.h> // Criação de janelas do sistema operacional
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// Headers locais, definidos na pasta "include/"
-#include "utils.h"
+#include "core/utils.hpp"
+#include "core/matrices.hpp"
 
-// Declaração de várias funções utilizadas em main().  Essas estão definidas
-// logo após a definição de main() neste arquivo.
-GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius);                  // Constrói triângulos para renderização
+GLuint BuildTriangles();                                                     // Constrói triângulos para renderização
 GLuint LoadShader_Vertex(const char *filename);                              // Carrega um vertex shader
 GLuint LoadShader_Fragment(const char *filename);                            // Carrega um fragment shader
 void LoadShader(const char *filename, GLuint shader_id);                     // Função utilizada pelas duas acima
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Cria um programa de GPU
 
-// Funções callback para comunicação com o sistema operacional e interação do
-// usuário. Veja mais comentários nas definições das mesmas, abaixo.
 void FramebufferSizeCallback(GLFWwindow *window, int width, int height);
 void ErrorCallback(int error, const char *description);
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
+void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+void CursorPosCallback(GLFWwindow *window, double xpos, double ypos);
+void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+
+struct SceneObject
+{
+  const char *name;     // Nome do objeto
+  void *firstIndex;     // Índice do primeiro vértice dentro do vetor indices[] definido em BuildTriangles()
+  int indicesNumber;    // Número de índices do objeto dentro do vetor indices[] definido em BuildTriangles()
+  GLenum renderingMode; // Modo de rasterização (GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.)
+};
+
+std::map<const char *, SceneObject> g_VirtualScene;
+
+// Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
+float g_ScreenRatio = 16.0f / 9.0f;
+
+// Ângulos de Euler que controlam a rotação de um dos cubos da cena virtual
+float g_AngleX = 0.0f;
+float g_AngleY = 0.0f;
+float g_AngleZ = 0.0f;
+
+// "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
+// pressionado no momento atual. Veja função MouseButtonCallback().
+bool g_LeftMouseButtonPressed = false;
+
+// Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
+// usuário através do mouse (veja função CursorPosCallback()). A posição
+// efetiva da câmera é calculada dentro da função main(), dentro do loop de
+// renderização.
+float g_CameraTheta = 0.0f;    // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
+float g_CameraDistance = 2.5f; // Distância da câmera para a origem
+
+glm::vec4 g_CameraCenter = glm::vec4(0.0f, 0.0f, 3.0f, 1.0f);
+glm::vec4 g_CameraTarget = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+const glm::vec4 g_CameraFront = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+const glm::vec4 g_CameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
+float g_DeltaTime = 0.0f;
+float g_LastFrame = 0.0f;
+
+// Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
+bool g_UsePerspectiveProjection = true;
 
 int main()
 {
-  // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
-  // sistema operacional, onde poderemos renderizar com OpenGL.
   int success = glfwInit();
-
   if (!success)
   {
     fprintf(stderr, "ERROR: glfwInit() failed.\n");
     std::exit(EXIT_FAILURE);
   }
 
-  // Definimos o callback para impressão de erros da GLFW no terminal
   glfwSetErrorCallback(ErrorCallback);
 
-  // Pedimos para utilizar OpenGL versão 3.3 (ou superior)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
@@ -54,14 +91,10 @@ int main()
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-  // Pedimos para utilizar o perfil "core", isto é, utilizaremos somente as
-  // funções modernas de OpenGL.
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  // Criamos uma janela do sistema operacional, com 500 colunas e 500 linhas
-  // de pixels, e com título "INF01047 ...".
   GLFWwindow *window;
-  window = glfwCreateWindow(500, 500, "INF01047 - 325735 - Ricardo Hermes Dalcin", NULL, NULL);
+  window = glfwCreateWindow(1280, 720, "INF01047 - Seu Cartao - Seu Nome", NULL, NULL);
   if (!window)
   {
     glfwTerminate();
@@ -69,23 +102,22 @@ int main()
     std::exit(EXIT_FAILURE);
   }
 
-  // Definimos a função de callback que será chamada sempre que o usuário
-  // pressionar alguma tecla do teclado.
   glfwSetKeyCallback(window, KeyCallback);
+  glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-  // Definimos a função de callback que será chamada sempre que a janela for
-  // redimensionada, por consequência alterando o tamanho do "framebuffer"
-  // (região de memória onde são armazenados os pixels da imagem).
+  glfwSetMouseButtonCallback(window, MouseButtonCallback);
+
+  glfwSetCursorPosCallback(window, CursorPosCallback);
+
+  glfwSetScrollCallback(window, ScrollCallback);
+
   glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+  glfwSetWindowSize(window, 1280, 720); // Forçamos a chamada do callback acima, para definir g_ScreenRatio.
 
-  // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
   glfwMakeContextCurrent(window);
 
-  // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
-  // biblioteca GLAD.
   gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-  // Imprimimos no terminal informações sobre a GPU do sistema
   const GLubyte *vendor = glGetString(GL_VENDOR);
   const GLubyte *renderer = glGetString(GL_RENDERER);
   const GLubyte *glversion = glGetString(GL_VERSION);
@@ -96,142 +128,201 @@ int main()
   GLuint vertex_shader_id = LoadShader_Vertex("src/shader_vertex.glsl");
   GLuint fragment_shader_id = LoadShader_Fragment("src/shader_fragment.glsl");
 
-  // Criamos um programa de GPU utilizando os shaders carregados acima
   GLuint program_id = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
 
-  GLuint vertexNumber = 16;
-  GLfloat radius = 0.7;
+  GLuint vertex_array_object_id = BuildTriangles();
 
-  // Construímos a representação de um triângulo
-  GLuint vertex_array_object_id = BuildTriangles(vertexNumber, radius);
+  GLint model_uniform = glGetUniformLocation(program_id, "model");
+  GLint view_uniform = glGetUniformLocation(program_id, "view");
+  GLint projection_uniform = glGetUniformLocation(program_id, "projection");
+  GLint render_as_black_uniform = glGetUniformLocation(program_id, "render_as_black");
 
-  // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
+  glEnable(GL_DEPTH_TEST);
+
   while (!glfwWindowShouldClose(window))
   {
-    // Aqui executamos as operações de renderização
+    g_DeltaTime = glfwGetTime() - g_LastFrame;
+    g_LastFrame = glfwGetTime();
 
-    // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
-    // definida como coeficientes RGBA: Red, Green, Blue, Alpha; isto é:
-    // Vermelho, Verde, Azul, Alpha (valor de transparência).
-    // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
-    //
-    //           R     G     B     A
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-    // "Pintamos" todos os pixels do framebuffer com a cor definida acima
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
-    // os shaders de vértice e fragmentos).
     glUseProgram(program_id);
 
-    // "Ligamos" o VAO. Informamos que queremos utilizar os atributos de
-    // vértices apontados pelo VAO criado pela função BuildTriangles(). Veja
-    // comentários detalhados dentro da definição de BuildTriangles().
     glBindVertexArray(vertex_array_object_id);
 
-    // Pedimos para a GPU rasterizar os vértices apontados pelo VAO como
-    // triângulos.
-    //
-    //                +--- Veja slides 124-130 do documento Aula_04_Modelagem_Geometrica_3D.pdf.
-    //                |          +--- O array "indices[]" contém 6 índices (veja função BuildTriangles()).
-    //                |          |  +--- Os índices são do tipo "GLubyte" (8 bits sem sinal)
-    //                |          |  |                 +--- Vértices começam em indices[0] (veja função BuildTriangles()).
-    //                |          |  |                 |
-    //                V          V  V                 V
-    glDrawElements(GL_TRIANGLE_FAN, vertexNumber + 2, GL_UNSIGNED_BYTE, 0);
+    // float r = g_CameraDistance;
+    // float y = r * sin(g_CameraPhi);
+    // float z = r * cos(g_CameraPhi) * cos(g_CameraTheta);
+    // float x = r * cos(g_CameraPhi) * sin(g_CameraTheta);
 
-    // "Desligamos" o VAO, evitando assim que operações posteriores venham a
-    // alterar o mesmo. Isso evita bugs.
+    // glm::vec4 camera_lookat_l = glm::vec4(x, y, z, 1.0f);
+    // glm::vec4 camera_view_vector = camera_lookat_l - g_CameraCenter;
+    // glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
+    // glm::mat4 view = Matrix_Camera_View(g_CameraCenter, camera_view_vector, camera_up_vector);
+
+    glm::mat4 projection;
+
+    float nearplane = -0.1f;
+    float farplane = -10.0f;
+
+    if (g_UsePerspectiveProjection)
+    {
+      float field_of_view = 3.141592 / 3.0f;
+      projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+    }
+    else
+    {
+      float t = 1.5f * g_CameraDistance / 2.5f;
+      float b = -t;
+      float r = t * g_ScreenRatio;
+      float l = -r;
+      projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
+    }
+
+    glm::vec4 cameraDirection = glm::normalize(g_CameraCenter - g_CameraTarget);
+
+    glm::vec4 upVector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
+    glm::vec4 cameraRight = glm::normalize(crossproduct(upVector, cameraDirection));
+    glm::vec4 cameraUp = crossproduct(cameraDirection, cameraRight);
+
+    glm::mat4 view = Matrix_Camera_View(g_CameraCenter, g_CameraFront, g_CameraUp);
+
+    glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
+
+    for (int i = 1; i <= 1; ++i)
+    {
+      glm::mat4 model;
+
+      if (i == 1)
+      {
+        model = Matrix_Identity();
+      }
+      else if (i == 2)
+      {
+        model = Matrix_Translate(0.0f, 0.0f, -2.0f)                                  // TERCEIRO translação
+                * Matrix_Rotate(3.141592f / 8.0f, glm::vec4(1.0f, 1.0f, 1.0f, 0.0f)) // SEGUNDO rotação
+                * Matrix_Scale(2.0f, 0.5f, 0.5f);                                    // PRIMEIRO escala
+      }
+      else if (i == 3)
+      {
+        model = Matrix_Translate(-2.0f, 0.0f, 0.0f) // QUARTO translação
+                * Matrix_Rotate_Z(g_AngleZ)         // TERCEIRO rotação Z de Euler
+                * Matrix_Rotate_Y(g_AngleY)         // SEGUNDO rotação Y de Euler
+                * Matrix_Rotate_X(g_AngleX);        // PRIMEIRO rotação X de Euler
+      }
+
+      glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+
+      glUniform1i(render_as_black_uniform, false);
+
+      glDrawElements(
+          g_VirtualScene["cube_faces"].renderingMode,
+          g_VirtualScene["cube_faces"].indicesNumber,
+          GL_UNSIGNED_INT,
+          (void *)g_VirtualScene["cube_faces"].firstIndex);
+
+      glLineWidth(4.0f);
+
+      glDrawElements(
+          g_VirtualScene["axes"].renderingMode,
+          g_VirtualScene["axes"].indicesNumber,
+          GL_UNSIGNED_INT,
+          (void *)g_VirtualScene["axes"].firstIndex);
+
+      glUniform1i(render_as_black_uniform, true);
+
+      glDrawElements(
+          g_VirtualScene["cube_edges"].renderingMode,
+          g_VirtualScene["cube_edges"].indicesNumber,
+          GL_UNSIGNED_INT,
+          (void *)g_VirtualScene["cube_edges"].firstIndex);
+
+      if (i == 3)
+      {
+        glPointSize(15.0f);
+        glDrawArrays(GL_POINTS, 3, 1);
+      }
+    }
+
+    glm::mat4 model = Matrix_Identity();
+
+    glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+
+    glLineWidth(10.0f);
+
+    glUniform1i(render_as_black_uniform, false);
+
+    glDrawElements(
+        g_VirtualScene["axes"].renderingMode,
+        g_VirtualScene["axes"].indicesNumber,
+        GL_UNSIGNED_INT,
+        (void *)g_VirtualScene["axes"].firstIndex);
+
     glBindVertexArray(0);
 
-    // O framebuffer onde OpenGL executa as operações de renderização não
-    // é o mesmo que está sendo mostrado para o usuário, caso contrário
-    // seria possível ver artefatos conhecidos como "screen tearing". A
-    // chamada abaixo faz a troca dos buffers, mostrando para o usuário
-    // tudo que foi renderizado pelas funções acima.
-    // Veja o link: https://en.wikipedia.org/w/index.php?title=Multiple_buffering&oldid=793452829#Double_buffering_in_computer_graphics
+    glm::vec4 p_model(0.5f, 0.5f, 0.5f, 1.0f);
+
     glfwSwapBuffers(window);
 
-    // Verificamos com o sistema operacional se houve alguma interação do
-    // usuário (teclado, mouse, ...). Caso positivo, as funções de callback
-    // definidas anteriormente usando glfwSet*Callback() serão chamadas
-    // pela biblioteca GLFW.
     glfwPollEvents();
   }
 
-  // Finalizamos o uso dos recursos do sistema operacional
   glfwTerminate();
 
   return 0;
 }
 
 // Constrói triângulos para futura renderização
-GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius)
+GLuint BuildTriangles()
 {
   // Primeiro, definimos os atributos de cada vértice.
 
-  // A posição de cada vértice é definida por coeficientes em "normalized
-  // device coordinates" (NDC), onde cada coeficiente está entre -1 e 1.
-  // (Veja slides 129-132 e 138-145 do documento Aula_03_Rendering_Pipeline_Grafico.pdf).
-  // Nas aulas sobre transformações geométrica veremos como transformar
-  // coeficientes em outros sistemas de coordenadas para coeficientes NDC.
+  // A posição de cada vértice é definida por coeficientes em um sistema de
+  // coordenadas local de cada modelo geométrico. Note o uso de coordenadas
+  // homogêneas.  Veja as seguintes referências:
   //
-  // Note que aqui adicionamos um quarto coeficiente W (igual a 1.0).
-  // Conversaremos sobre isso quando tratarmos de coordenadas homogêneas.
+  //  - slides 35-48 do documento Aula_08_Sistemas_de_Coordenadas.pdf;
+  //  - slides 184-190 do documento Aula_08_Sistemas_de_Coordenadas.pdf;
   //
-  // Este vetor "NDC_coefficients" define a GEOMETRIA (veja slides 64-71 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
+  // Este vetor "model_coefficients" define a GEOMETRIA (veja slides 103-110 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
   //
-
-  GLfloat pi = atan(1) * 4;
-
-  GLfloat NDC_coefficients[(vertexNumber + 1) * 4];
-  GLfloat color_coefficients[(vertexNumber + 1) * 4];
-  GLubyte indices[vertexNumber + 2];
-
-  NDC_coefficients[0] = 0.0f;
-  NDC_coefficients[1] = 0.0f;
-  NDC_coefficients[2] = 0.0f;
-  NDC_coefficients[3] = 1.0f;
-
-  color_coefficients[0] = 1.0f;
-  color_coefficients[1] = 0.0f;
-  color_coefficients[2] = 0.0f;
-  color_coefficients[3] = 1.0f;
-
-  indices[0] = 0;
-  indices[vertexNumber + 1] = 1;
-
-  for (int i = 1; i <= vertexNumber; i++)
-  {
-    int initialIndex = i * 4;
-
-    GLfloat currentAngle = pi + (2.0f * pi / vertexNumber) * (i - 1);
-
-    GLfloat x = radius * cos(currentAngle);
-    GLfloat y = radius * sin(currentAngle);
-
-    NDC_coefficients[initialIndex] = x;
-    NDC_coefficients[initialIndex + 1] = y;
-    NDC_coefficients[initialIndex + 2] = 0.0f;
-    NDC_coefficients[initialIndex + 3] = 1.0f;
-
-    color_coefficients[initialIndex] = 0.0f;
-    color_coefficients[initialIndex + 1] = 0.0f;
-    color_coefficients[initialIndex + 2] = 1.0f;
-    color_coefficients[initialIndex + 3] = 1.0f;
-
-    indices[i] = i;
-  }
+  GLfloat model_coefficients[] = {
+      // Vértices de um cubo
+      //    X      Y     Z     W
+      -0.5f, 0.5f, 0.5f, 1.0f,   // posição do vértice 0
+      -0.5f, -0.5f, 0.5f, 1.0f,  // posição do vértice 1
+      0.5f, -0.5f, 0.5f, 1.0f,   // posição do vértice 2
+      0.5f, 0.5f, 0.5f, 1.0f,    // posição do vértice 3
+      -0.5f, 0.5f, -0.5f, 1.0f,  // posição do vértice 4
+      -0.5f, -0.5f, -0.5f, 1.0f, // posição do vértice 5
+      0.5f, -0.5f, -0.5f, 1.0f,  // posição do vértice 6
+      0.5f, 0.5f, -0.5f, 1.0f,   // posição do vértice 7
+                                 // Vértices para desenhar o eixo X
+                                 //    X      Y     Z     W
+      0.0f, 0.0f, 0.0f, 1.0f,    // posição do vértice 8
+      1.0f, 0.0f, 0.0f, 1.0f,    // posição do vértice 9
+                                 // Vértices para desenhar o eixo Y
+                                 //    X      Y     Z     W
+      0.0f, 0.0f, 0.0f, 1.0f,    // posição do vértice 10
+      0.0f, 1.0f, 0.0f, 1.0f,    // posição do vértice 11
+                                 // Vértices para desenhar o eixo Z
+                                 //    X      Y     Z     W
+      0.0f, 0.0f, 0.0f, 1.0f,    // posição do vértice 12
+      0.0f, 0.0f, 1.0f, 1.0f,    // posição do vértice 13
+  };
 
   // Criamos o identificador (ID) de um Vertex Buffer Object (VBO).  Um VBO é
   // um buffer de memória que irá conter os valores de um certo atributo de
   // um conjunto de vértices; por exemplo: posição, cor, normais, coordenadas
-  // de textura. Neste exemplo utilizaremos vários VBOs, um para cada tipo de
-  // atributo.  Agora criamos um VBO para armazenarmos um atributo: posição
-  // (coeficientes NDC definidos acima).
-  GLuint VBO_NDC_coefficients_id;
-  glGenBuffers(1, &VBO_NDC_coefficients_id);
+  // de textura.  Neste exemplo utilizaremos vários VBOs, um para cada tipo de atributo.
+  // Agora criamos um VBO para armazenarmos um atributo: posição.
+  GLuint VBO_model_coefficients_id;
+  glGenBuffers(1, &VBO_model_coefficients_id);
 
   // Criamos o identificador (ID) de um Vertex Array Object (VAO).  Um VAO
   // contém a definição de vários atributos de um certo conjunto de vértices;
@@ -244,13 +335,13 @@ GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius)
   glBindVertexArray(vertex_array_object_id);
 
   // "Ligamos" o VBO ("bind"). Informamos que o VBO cujo ID está contido na
-  // variável VBO_NDC_coefficients_id será modificado a seguir. A
+  // variável VBO_model_coefficients_id será modificado a seguir. A
   // constante "GL_ARRAY_BUFFER" informa que esse buffer é de fato um VBO, e
   // irá conter atributos de vértices.
-  glBindBuffer(GL_ARRAY_BUFFER, VBO_NDC_coefficients_id);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO_model_coefficients_id);
 
   // Alocamos memória para o VBO "ligado" acima. Como queremos armazenar
-  // nesse VBO todos os valores contidos no array "NDC_coefficients", pedimos
+  // nesse VBO todos os valores contidos no array "model_coefficients", pedimos
   // para alocar um número de bytes exatamente igual ao tamanho ("size")
   // desse array. A constante "GL_STATIC_DRAW" dá uma dica para o driver da
   // GPU sobre como utilizaremos os dados do VBO. Neste caso, estamos dizendo
@@ -260,20 +351,20 @@ GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius)
   //
   //            glBufferData()  ==  malloc() do C  ==  new do C++.
   //
-  glBufferData(GL_ARRAY_BUFFER, sizeof(NDC_coefficients), NULL, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(model_coefficients), NULL, GL_STATIC_DRAW);
 
-  // Finalmente, copiamos os valores do array NDC_coefficients para dentro do
+  // Finalmente, copiamos os valores do array model_coefficients para dentro do
   // VBO "ligado" acima.  Pense que:
   //
   //            glBufferSubData()  ==  memcpy() do C.
   //
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(NDC_coefficients), NDC_coefficients);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(model_coefficients), model_coefficients);
 
   // Precisamos então informar um índice de "local" ("location"), o qual será
   // utilizado no shader "shader_vertex.glsl" para acessar os valores
   // armazenados no VBO "ligado" acima. Também, informamos a dimensão (número de
-  // coeficientes) destes atributos. Como em nosso caso são coordenadas NDC
-  // homogêneas, temos quatro coeficientes por vértice (X,Y,Z,W). Isto define
+  // coeficientes) destes atributos. Como em nosso caso são pontos em coordenadas
+  // homogêneas, temos quatro coeficientes por vértice (X,Y,Z,W). Isso define
   // um tipo de dado chamado de "vec4" em "shader_vertex.glsl": um vetor com
   // quatro coeficientes. Finalmente, informamos que os dados estão em ponto
   // flutuante com 32 bits (GL_FLOAT).
@@ -290,9 +381,35 @@ GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius)
   glEnableVertexAttribArray(location);
 
   // "Desligamos" o VBO, evitando assim que operações posteriores venham a
-  // alterar o mesmo. Isto evita bugs.
+  // alterar o mesmo. Isso evita bugs.
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+  // Agora repetimos todos os passos acima para atribuir um novo atributo a
+  // cada vértice: uma cor (veja slides 109-112 do documento Aula_03_Rendering_Pipeline_Grafico.pdf e slide 111 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
+  // Tal cor é definida como coeficientes RGBA: Red, Green, Blue, Alpha;
+  // isto é: Vermelho, Verde, Azul, Alpha (valor de transparência).
+  // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
+  GLfloat color_coefficients[] = {
+      // Cores dos vértices do cubo
+      //  R     G     B     A
+      1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 0
+      1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 1
+      0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 2
+      0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 3
+      1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 4
+      1.0f, 0.5f, 0.0f, 1.0f, // cor do vértice 5
+      0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 6
+      0.0f, 0.5f, 1.0f, 1.0f, // cor do vértice 7
+                              // Cores para desenhar o eixo X
+      1.0f, 0.0f, 0.0f, 1.0f, // cor do vértice 8
+      1.0f, 0.0f, 0.0f, 1.0f, // cor do vértice 9
+                              // Cores para desenhar o eixo Y
+      0.0f, 1.0f, 0.0f, 1.0f, // cor do vértice 10
+      0.0f, 1.0f, 0.0f, 1.0f, // cor do vértice 11
+                              // Cores para desenhar o eixo Z
+      0.0f, 0.0f, 1.0f, 1.0f, // cor do vértice 12
+      0.0f, 0.0f, 1.0f, 1.0f, // cor do vértice 13
+  };
   GLuint VBO_color_coefficients_id;
   glGenBuffers(1, &VBO_color_coefficients_id);
   glBindBuffer(GL_ARRAY_BUFFER, VBO_color_coefficients_id);
@@ -303,6 +420,81 @@ GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius)
   glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(location);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  // Vamos então definir polígonos utilizando os vértices do array
+  // model_coefficients.
+  //
+  // Para referência sobre os modos de renderização, veja slides 182-188 do documento Aula_04_Modelagem_Geometrica_3D.pdf.
+  //
+  // Este vetor "indices" define a TOPOLOGIA (veja slides 103-110 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
+  //
+  GLuint indices[] = {
+      // Definimos os índices dos vértices que definem as FACES de um cubo
+      // através de 12 triângulos que serão desenhados com o modo de renderização
+      // GL_TRIANGLES.
+      0, 1, 2, // triângulo 1
+      7, 6, 5, // triângulo 2
+      3, 2, 6, // triângulo 3
+      4, 0, 3, // triângulo 4
+      4, 5, 1, // triângulo 5
+      1, 5, 6, // triângulo 6
+      0, 2, 3, // triângulo 7
+      7, 5, 4, // triângulo 8
+      3, 6, 7, // triângulo 9
+      4, 3, 7, // triângulo 10
+      4, 1, 0, // triângulo 11
+      1, 6, 2, // triângulo 12
+               // Definimos os índices dos vértices que definem as ARESTAS de um cubo
+               // através de 12 linhas que serão desenhadas com o modo de renderização
+               // GL_LINES.
+      0, 1,    // linha 1
+      1, 2,    // linha 2
+      2, 3,    // linha 3
+      3, 0,    // linha 4
+      0, 4,    // linha 5
+      4, 7,    // linha 6
+      7, 6,    // linha 7
+      6, 2,    // linha 8
+      6, 5,    // linha 9
+      5, 4,    // linha 10
+      5, 1,    // linha 11
+      7, 3,    // linha 12
+               // Definimos os índices dos vértices que definem as linhas dos eixos X, Y,
+               // Z, que serão desenhados com o modo GL_LINES.
+      8, 9,    // linha 1
+      10, 11,  // linha 2
+      12, 13   // linha 3
+  };
+
+  // Criamos um primeiro objeto virtual (SceneObject) que se refere às faces
+  // coloridas do cubo.
+  SceneObject cube_faces;
+  cube_faces.name = "Cubo (faces coloridas)";
+  cube_faces.firstIndex = (void *)0;       // Primeiro índice está em indices[0]
+  cube_faces.indicesNumber = 36;           // Último índice está em indices[35]; total de 36 índices.
+  cube_faces.renderingMode = GL_TRIANGLES; // Índices correspondem ao tipo de rasterização GL_TRIANGLES.
+
+  // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+  g_VirtualScene["cube_faces"] = cube_faces;
+
+  // Criamos um segundo objeto virtual (SceneObject) que se refere às arestas
+  // pretas do cubo.
+  SceneObject cube_edges;
+  cube_edges.name = "Cubo (arestas pretas)";
+  cube_edges.firstIndex = (void *)(36 * sizeof(GLuint)); // Primeiro índice está em indices[36]
+  cube_edges.indicesNumber = 24;                         // Último índice está em indices[59]; total de 24 índices.
+  cube_edges.renderingMode = GL_LINES;                   // Índices correspondem ao tipo de rasterização GL_LINES.
+
+  // Adicionamos o objeto criado acima na nossa cena virtual (g_VirtualScene).
+  g_VirtualScene["cube_edges"] = cube_edges;
+
+  // Criamos um terceiro objeto virtual (SceneObject) que se refere aos eixos XYZ.
+  SceneObject axes;
+  axes.name = "Eixos XYZ";
+  axes.firstIndex = (void *)(60 * sizeof(GLuint)); // Primeiro índice está em indices[60]
+  axes.indicesNumber = 6;                          // Último índice está em indices[65]; total de 6 índices.
+  axes.renderingMode = GL_LINES;                   // Índices correspondem ao tipo de rasterização GL_LINES.
+  g_VirtualScene["axes"] = axes;
 
   // Criamos um buffer OpenGL para armazenar os índices acima
   GLuint indices_id;
@@ -333,7 +525,7 @@ GLuint BuildTriangles(GLuint vertexNumber, GLfloat radius)
   return vertex_array_object_id;
 }
 
-// Carrega um Vertex Shader de um arquivo. Veja definição de LoadShader() abaixo.
+// Carrega um Vertex Shader de um arquivo GLSL. Veja definição de LoadShader() abaixo.
 GLuint LoadShader_Vertex(const char *filename)
 {
   // Criamos um identificador (ID) para este shader, informando que o mesmo
@@ -347,7 +539,7 @@ GLuint LoadShader_Vertex(const char *filename)
   return vertex_shader_id;
 }
 
-// Carrega um Fragment Shader de um arquivo. Veja definição de LoadShader() abaixo.
+// Carrega um Fragment Shader de um arquivo GLSL . Veja definição de LoadShader() abaixo.
 GLuint LoadShader_Fragment(const char *filename)
 {
   // Criamos um identificador (ID) para este shader, informando que o mesmo
@@ -469,7 +661,7 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
     output += "ERROR: OpenGL linking of program failed.\n";
     output += "== Start of link log\n";
     output += log;
-    output += "== End of link log\n";
+    output += "\n== End of link log\n";
 
     // A chamada "delete" em C++ é equivalente ao "free()" do C
     delete[] log;
@@ -477,7 +669,7 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
     fprintf(stderr, "%s", output.c_str());
   }
 
-  // Retorna o ID gerado acima
+  // Retornamos o ID gerado acima
   return program_id;
 }
 
@@ -489,25 +681,180 @@ void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
   // Indicamos que queremos renderizar em toda região do framebuffer. A
   // função "glViewport" define o mapeamento das "normalized device
   // coordinates" (NDC) para "pixel coordinates".  Essa é a operação de
-  // "Screen Mapping" ou "Viewport Mapping" vista em aula (slides 141-148 do documento Aula_03_Rendering_Pipeline_Grafico.pdf).
+  // "Screen Mapping" ou "Viewport Mapping" vista em aula ({+ViewportMapping2+}).
   glViewport(0, 0, width, height);
+
+  // Atualizamos também a razão que define a proporção da janela (largura /
+  // altura), a qual será utilizada na definição das matrizes de projeção,
+  // tal que não ocorra distorções durante o processo de "Screen Mapping"
+  // acima, quando NDC é mapeado para coordenadas de pixels. Veja slides 205-215 do documento Aula_09_Projecoes.pdf.
+  //
+  // O cast para float é necessário pois números inteiros são arredondados ao
+  // serem divididos!
+  g_ScreenRatio = (float)width / height;
+}
+
+// Variáveis globais que armazenam a última posição do cursor do mouse, para
+// que possamos calcular quanto que o mouse se movimentou entre dois instantes
+// de tempo. Utilizadas no callback CursorPosCallback() abaixo.
+double g_LastCursorPosX, g_LastCursorPosY;
+
+// Função callback chamada sempre que o usuário aperta algum dos botões do mouse
+void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+{
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+  {
+    // Se o usuário pressionou o botão esquerdo do mouse, guardamos a
+    // posição atual do cursor nas variáveis g_LastCursorPosX e
+    // g_LastCursorPosY.  Também, setamos a variável
+    // g_LeftMouseButtonPressed como true, para saber que o usuário está
+    // com o botão esquerdo pressionado.
+    glfwGetCursorPos(window, &g_LastCursorPosX, &g_LastCursorPosY);
+    g_LeftMouseButtonPressed = true;
+  }
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+  {
+    // Quando o usuário soltar o botão esquerdo do mouse, atualizamos a
+    // variável abaixo para false.
+    g_LeftMouseButtonPressed = false;
+  }
+}
+
+// Função callback chamada sempre que o usuário movimentar o cursor do mouse em
+// cima da janela OpenGL.
+void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
+{
+  // Abaixo executamos o seguinte: caso o botão esquerdo do mouse esteja
+  // pressionado, computamos quanto que o mouse se movimento desde o último
+  // instante de tempo, e usamos esta movimentação para atualizar os
+  // parâmetros que definem a posição da câmera dentro da cena virtual.
+  // Assim, temos que o usuário consegue controlar a câmera.
+
+  if (!g_LeftMouseButtonPressed)
+    return;
+
+  // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
+  float dx = xpos - g_LastCursorPosX;
+  float dy = ypos - g_LastCursorPosY;
+
+  // Atualizamos parâmetros da câmera com os deslocamentos
+  g_CameraTheta -= 0.01f * dx;
+  g_CameraPhi -= 0.01f * dy;
+
+  // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
+  float phimax = 3.141592f / 2;
+  float phimin = -phimax;
+
+  if (g_CameraPhi > phimax)
+    g_CameraPhi = phimax;
+
+  if (g_CameraPhi < phimin)
+    g_CameraPhi = phimin;
+
+  // Atualizamos as variáveis globais para armazenar a posição atual do
+  // cursor como sendo a última posição conhecida do cursor.
+  g_LastCursorPosX = xpos;
+  g_LastCursorPosY = ypos;
+}
+
+// Função callback chamada sempre que o usuário movimenta a "rodinha" do mouse.
+void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+{
+  // Atualizamos a distância da câmera para a origem utilizando a
+  // movimentação da "rodinha", simulando um ZOOM.
+  g_CameraDistance -= 0.1f * yoffset;
+
+  // Uma câmera look-at nunca pode estar exatamente "em cima" do ponto para
+  // onde ela está olhando, pois isto gera problemas de divisão por zero na
+  // definição do sistema de coordenadas da câmera. Isto é, a variável abaixo
+  // nunca pode ser zero. Versões anteriores deste código possuíam este bug,
+  // o qual foi detectado pelo aluno Vinicius Fraga (2017/2).
+  const float verysmallnumber = std::numeric_limits<float>::epsilon();
+  if (g_CameraDistance < verysmallnumber)
+    g_CameraDistance = verysmallnumber;
 }
 
 // Definição da função que será chamada sempre que o usuário pressionar alguma
 // tecla do teclado. Veja http://www.glfw.org/docs/latest/input_guide.html#input_key
-void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode)
+void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
 {
   // ================
   // Não modifique este loop! Ele é utilizando para correção automatizada dos
   // laboratórios. Deve ser sempre o primeiro comando desta função KeyCallback().
   for (int i = 0; i < 10; ++i)
-    if (key == GLFW_KEY_0 + i && action == GLFW_PRESS && mode == GLFW_MOD_SHIFT)
+    if (key == GLFW_KEY_0 + i && action == GLFW_PRESS && mod == GLFW_MOD_SHIFT)
       std::exit(100 + i);
   // ================
 
   // Se o usuário pressionar a tecla ESC, fechamos a janela.
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
+
+  // O código abaixo implementa a seguinte lógica:
+  //   Se apertar tecla X       então g_AngleX += delta;
+  //   Se apertar tecla shift+X então g_AngleX -= delta;
+  //   Se apertar tecla Y       então g_AngleY += delta;
+  //   Se apertar tecla shift+Y então g_AngleY -= delta;
+  //   Se apertar tecla Z       então g_AngleZ += delta;
+  //   Se apertar tecla shift+Z então g_AngleZ -= delta;
+
+  float delta = 3.141592 / 16; // 22.5 graus, em radianos.
+
+  if (key == GLFW_KEY_X && (action == GLFW_PRESS || action == GLFW_REPEAT))
+  {
+    g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+  }
+
+  if (key == GLFW_KEY_Y && (action == GLFW_PRESS || action == GLFW_REPEAT))
+  {
+    g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+  }
+  if (key == GLFW_KEY_Z && (action == GLFW_PRESS || action == GLFW_REPEAT))
+  {
+    g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+  }
+
+  // Se o usuário apertar a tecla espaço, resetamos os ângulos de Euler para zero.
+  if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+  {
+    g_AngleX = 0.0f;
+    g_AngleY = 0.0f;
+    g_AngleZ = 0.0f;
+  }
+
+  // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
+  if (key == GLFW_KEY_P && action == GLFW_PRESS)
+  {
+    g_UsePerspectiveProjection = true;
+  }
+
+  // Se o usuário apertar a tecla O, utilizamos projeção ortográfica.
+  if (key == GLFW_KEY_O && action == GLFW_PRESS)
+  {
+    g_UsePerspectiveProjection = false;
+  }
+
+  float cameraSpeed = 2.5f * g_DeltaTime;
+
+  if (key == GLFW_KEY_W && (action == GLFW_PRESS))
+  {
+    g_CameraCenter += cameraSpeed * g_CameraFront;
+  }
+
+  if (key == GLFW_KEY_S && (action == GLFW_PRESS))
+  {
+    g_CameraCenter -= cameraSpeed * g_CameraFront;
+  }
+
+  if (key == GLFW_KEY_A && (action == GLFW_PRESS))
+  {
+    g_CameraCenter -= cameraSpeed * glm::normalize(crossproduct(g_CameraFront, g_CameraUp));
+  }
+
+  if (key == GLFW_KEY_D && (action == GLFW_PRESS))
+  {
+    g_CameraCenter += cameraSpeed * glm::normalize(crossproduct(g_CameraFront, g_CameraUp));
+  }
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal
@@ -516,4 +863,5 @@ void ErrorCallback(int error, const char *description)
   fprintf(stderr, "ERROR: GLFW: %s\n", description);
 }
 
+// set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
 // vim: set spell spelllang=pt_br :
