@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "build",
+      "command": "g++",
+      "args": [
+        "-fdiagnostics-color=always",
+        "-Wall",
+        "-Wno-unused-function",
+        "-g",
+        "${workspaceFolder}/src/*.cpp",
+        "${workspaceFolder}/lib/*.a",
+        "${workspaceFolder}/lib/*.c",
+        "-o",
+        "${workspaceFolder}/bin/main.exe",
+        "-I${workspaceFolder}/include",
+        "-lgdi32",
+        "-lmingw32",
+        "-lopengl32",
+        "-lglu32"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Compiler: g++"
+    }
+  ]
+}

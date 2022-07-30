@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "C/C++",
+      "includePath": ["${workspaceFolder}/**"],
+      "intelliSenseMode": "windows-gcc-x64",
+      "compilerPath": "C:/Program Files/mingw/bin/g++.exe",
+      "cStandard": "c17",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}
