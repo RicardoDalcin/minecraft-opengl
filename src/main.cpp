@@ -41,6 +41,16 @@ struct SceneObject
 
 std::map<const char *, SceneObject> g_VirtualScene;
 
+struct PressedKeys
+{
+  bool front;
+  bool back;
+  bool left;
+  bool right;
+};
+
+PressedKeys g_PressedKeys = {false, false, false, false};
+
 // Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
 float g_ScreenRatio = 16.0f / 9.0f;
 
@@ -57,14 +67,13 @@ bool g_LeftMouseButtonPressed = false;
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f;    // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;      // Ângulo em relação ao eixo Y
-float g_CameraDistance = 2.5f; // Distância da câmera para a origem
+float g_CameraTheta = 3.141592f / 4; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 3.141592f / 6;   // Ângulo em relação ao eixo Y
+float g_CameraDistance = 2.5f;       // Distância da câmera para a origem
 
 glm::vec4 g_CameraCenter = glm::vec4(0.0f, 0.0f, 3.0f, 1.0f);
-glm::vec4 g_CameraTarget = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+glm::vec4 g_CameraTarget = glm::vec4(1.0f, 1.0f, -1.0f, 1.0f);
 
-const glm::vec4 g_CameraFront = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 const glm::vec4 g_CameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
 float g_DeltaTime = 0.0f;
@@ -94,7 +103,7 @@ int main()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow *window;
-  window = glfwCreateWindow(1280, 720, "INF01047 - Seu Cartao - Seu Nome", NULL, NULL);
+  window = glfwCreateWindow(1280, 720, "Minecraft", NULL, NULL);
   if (!window)
   {
     glfwTerminate();
@@ -103,11 +112,11 @@ int main()
   }
 
   glfwSetKeyCallback(window, KeyCallback);
-  glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
   glfwSetMouseButtonCallback(window, MouseButtonCallback);
 
   glfwSetCursorPosCallback(window, CursorPosCallback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
   glfwSetScrollCallback(window, ScrollCallback);
 
@@ -144,6 +153,40 @@ int main()
     g_DeltaTime = glfwGetTime() - g_LastFrame;
     g_LastFrame = glfwGetTime();
 
+    float x = cos(g_CameraPhi) * sin(g_CameraTheta);
+    float y = sin(g_CameraPhi);
+    float z = cos(g_CameraPhi) * cos(g_CameraTheta);
+
+    glm::vec4 cameraFront = glm::normalize(glm::vec4(x, y, z, 0.0f));
+
+    float cameraSpeed = 2.5f * g_DeltaTime;
+
+    if (g_PressedKeys.front)
+    {
+      g_CameraCenter += cameraSpeed * cameraFront;
+    }
+
+    if (g_PressedKeys.back)
+    {
+      g_CameraCenter -= cameraSpeed * cameraFront;
+    }
+
+    if (g_PressedKeys.left)
+    {
+      glm::vec4 w = -cameraFront / norm(cameraFront);
+      glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
+
+      g_CameraCenter -= cameraSpeed * u;
+    }
+
+    if (g_PressedKeys.right)
+    {
+      glm::vec4 w = -cameraFront / norm(cameraFront);
+      glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
+
+      g_CameraCenter += cameraSpeed * u;
+    }
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -151,17 +194,6 @@ int main()
     glUseProgram(program_id);
 
     glBindVertexArray(vertex_array_object_id);
-
-    // float r = g_CameraDistance;
-    // float y = r * sin(g_CameraPhi);
-    // float z = r * cos(g_CameraPhi) * cos(g_CameraTheta);
-    // float x = r * cos(g_CameraPhi) * sin(g_CameraTheta);
-
-    // glm::vec4 camera_lookat_l = glm::vec4(x, y, z, 1.0f);
-    // glm::vec4 camera_view_vector = camera_lookat_l - g_CameraCenter;
-    // glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-
-    // glm::mat4 view = Matrix_Camera_View(g_CameraCenter, camera_view_vector, camera_up_vector);
 
     glm::mat4 projection;
 
@@ -182,14 +214,7 @@ int main()
       projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
     }
 
-    glm::vec4 cameraDirection = glm::normalize(g_CameraCenter - g_CameraTarget);
-
-    glm::vec4 upVector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-
-    glm::vec4 cameraRight = glm::normalize(crossproduct(upVector, cameraDirection));
-    glm::vec4 cameraUp = crossproduct(cameraDirection, cameraRight);
-
-    glm::mat4 view = Matrix_Camera_View(g_CameraCenter, g_CameraFront, g_CameraUp);
+    glm::mat4 view = Matrix_Camera_View(g_CameraCenter, cameraFront, g_CameraUp);
 
     glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
@@ -201,19 +226,6 @@ int main()
       if (i == 1)
       {
         model = Matrix_Identity();
-      }
-      else if (i == 2)
-      {
-        model = Matrix_Translate(0.0f, 0.0f, -2.0f)                                  // TERCEIRO translação
-                * Matrix_Rotate(3.141592f / 8.0f, glm::vec4(1.0f, 1.0f, 1.0f, 0.0f)) // SEGUNDO rotação
-                * Matrix_Scale(2.0f, 0.5f, 0.5f);                                    // PRIMEIRO escala
-      }
-      else if (i == 3)
-      {
-        model = Matrix_Translate(-2.0f, 0.0f, 0.0f) // QUARTO translação
-                * Matrix_Rotate_Z(g_AngleZ)         // TERCEIRO rotação Z de Euler
-                * Matrix_Rotate_Y(g_AngleY)         // SEGUNDO rotação Y de Euler
-                * Matrix_Rotate_X(g_AngleX);        // PRIMEIRO rotação X de Euler
       }
 
       glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
@@ -730,16 +742,16 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
   // parâmetros que definem a posição da câmera dentro da cena virtual.
   // Assim, temos que o usuário consegue controlar a câmera.
 
-  if (!g_LeftMouseButtonPressed)
-    return;
+  // if (!g_LeftMouseButtonPressed)
+  //   return;
 
   // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
   float dx = xpos - g_LastCursorPosX;
   float dy = ypos - g_LastCursorPosY;
 
   // Atualizamos parâmetros da câmera com os deslocamentos
-  g_CameraTheta -= 0.01f * dx;
-  g_CameraPhi -= 0.01f * dy;
+  g_CameraTheta -= 0.003f * dx;
+  g_CameraPhi -= 0.003f * dy;
 
   // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
   float phimax = 3.141592f / 2;
@@ -834,26 +846,40 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
     g_UsePerspectiveProjection = false;
   }
 
-  float cameraSpeed = 2.5f * g_DeltaTime;
-
-  if (key == GLFW_KEY_W && (action == GLFW_PRESS))
+  if (key == GLFW_KEY_W)
   {
-    g_CameraCenter += cameraSpeed * g_CameraFront;
+    if (action == GLFW_PRESS)
+      g_PressedKeys.front = true;
+
+    if (action == GLFW_RELEASE)
+      g_PressedKeys.front = false;
   }
 
-  if (key == GLFW_KEY_S && (action == GLFW_PRESS))
+  if (key == GLFW_KEY_S)
   {
-    g_CameraCenter -= cameraSpeed * g_CameraFront;
+    if (action == GLFW_PRESS)
+      g_PressedKeys.back = true;
+
+    if (action == GLFW_RELEASE)
+      g_PressedKeys.back = false;
   }
 
-  if (key == GLFW_KEY_A && (action == GLFW_PRESS))
+  if (key == GLFW_KEY_A)
   {
-    g_CameraCenter -= cameraSpeed * glm::normalize(crossproduct(g_CameraFront, g_CameraUp));
+    if (action == GLFW_PRESS)
+      g_PressedKeys.left = true;
+
+    if (action == GLFW_RELEASE)
+      g_PressedKeys.left = false;
   }
 
-  if (key == GLFW_KEY_D && (action == GLFW_PRESS))
+  if (key == GLFW_KEY_D)
   {
-    g_CameraCenter += cameraSpeed * glm::normalize(crossproduct(g_CameraFront, g_CameraUp));
+    if (action == GLFW_PRESS)
+      g_PressedKeys.right = true;
+
+    if (action == GLFW_RELEASE)
+      g_PressedKeys.right = false;
   }
 }
 
