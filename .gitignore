@@ -28,6 +28,7 @@ obj
 *.lai
 *.la
 *.a
+!external/**/*.a
 *.lib
 
 # Executables
