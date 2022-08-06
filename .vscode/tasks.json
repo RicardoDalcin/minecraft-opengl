@@ -11,6 +11,7 @@
         "-Wno-unused-function",
         "-g",
         "${workspaceFolder}/src/core/*.cpp",
+        "${workspaceFolder}/src/engine/*.cpp",
         "${workspaceFolder}/src/*.cpp",
         "${workspaceFolder}/external/lib/*.a",
         "${workspaceFolder}/external/lib/*.c",

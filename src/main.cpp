@@ -15,8 +15,20 @@
 #include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+
+#include <stb_image/stb_image.h>
+
 #include "core/utils.hpp"
 #include "core/matrices.hpp"
+
+#include "engine/IndexBuffer.hpp"
+#include "engine/VertexArray.hpp"
+#include "engine/VertexBuffer.hpp"
+#include "engine/VertexBufferLayout.hpp"
+#include "engine/Shader.hpp"
+#include "engine/Texture.hpp"
+#include "engine/Renderer.hpp"
 
 GLuint BuildTriangles();                                                     // Constrói triângulos para renderização
 GLuint LoadShader_Vertex(const char *filename);                              // Carrega um vertex shader
@@ -134,154 +146,242 @@ int main()
 
   printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
-  GLuint vertex_shader_id = LoadShader_Vertex("src/shader_vertex.glsl");
-  GLuint fragment_shader_id = LoadShader_Fragment("src/shader_fragment.glsl");
+  // GLuint vertex_shader_id = LoadShader_Vertex("src/shader_vertex.glsl");
+  // GLuint fragment_shader_id = LoadShader_Fragment("src/shader_fragment.glsl");
 
-  GLuint program_id = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
+  // GLuint program_id = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
 
-  GLuint vertex_array_object_id = BuildTriangles();
+  // GLuint vertex_array_object_id = BuildTriangles();
 
-  GLint model_uniform = glGetUniformLocation(program_id, "model");
-  GLint view_uniform = glGetUniformLocation(program_id, "view");
-  GLint projection_uniform = glGetUniformLocation(program_id, "projection");
-  GLint render_as_black_uniform = glGetUniformLocation(program_id, "render_as_black");
+  // GLint model_uniform = glGetUniformLocation(program_id, "model");
+  // GLint view_uniform = glGetUniformLocation(program_id, "view");
+  // GLint projection_uniform = glGetUniformLocation(program_id, "projection");
+  // GLint render_as_black_uniform = glGetUniformLocation(program_id, "render_as_black");
 
-  glEnable(GL_DEPTH_TEST);
+  // glEnable(GL_DEPTH_TEST);
 
-  while (!glfwWindowShouldClose(window))
   {
-    g_DeltaTime = glfwGetTime() - g_LastFrame;
-    g_LastFrame = glfwGetTime();
+    int x = 2;
+    int y = 0;
 
-    float x = cos(g_CameraPhi) * sin(g_CameraTheta);
-    float y = sin(g_CameraPhi);
-    float z = cos(g_CameraPhi) * cos(g_CameraTheta);
+    float spriteWidth = 16.0f;
+    float spriteHeight = 16.0f;
+    float sheetWidth = 256.0f;
+    float sheetHeight = 256.0f;
 
-    glm::vec4 cameraFront = glm::normalize(glm::vec4(x, y, z, 0.0f));
+    // float positions[] = {
+    //     0.0f, 0.0f, (x * spriteWidth) / sheetHeight, (y * spriteHeight) / sheetHeight,
+    //     400.0f, 0.0f, ((x + 1) * spriteWidth) / sheetWidth, (y * spriteHeight) / sheetHeight,
+    //     400.0f, 400.0f, ((x + 1) * spriteWidth) / sheetWidth, ((y + 1) * spriteHeight) / sheetHeight,
+    //     0.0f, 400.0f, (x * spriteWidth) / sheetHeight, ((y + 1) * spriteHeight) / sheetHeight};
 
-    float cameraSpeed = 2.5f * g_DeltaTime;
+    float positions[] = {
+        0.0f, 0.0f, 0.0f, 0.0f,
+        400.0f, 0.0f, 1.0f, 0.0f,
+        400.0f, 400.0f, 1.0f, 1.0f,
+        0.0f, 400.0f, 0.0f, 1.0f};
 
-    if (g_PressedKeys.front)
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0};
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    unsigned int vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    VertexArray va;
+    VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+
+    VertexBufferLayout layout;
+    layout.Push(LayoutType::LT_FLOAT, 2);
+    layout.Push(LayoutType::LT_FLOAT, 2);
+    va.AddBuffer(vb, layout);
+
+    IndexBuffer ib(indices, 6);
+
+    glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+
+    Shader shader("src/Basic.shader");
+    shader.Bind();
+    shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+    Texture texture("extras/textures/BlockAtlas.png");
+    texture.Bind();
+    shader.SetUniform1i("u_Texture", 0);
+
+    va.Unbind();
+    vb.Unbind();
+    ib.Unbind();
+    shader.Unbind();
+
+    Renderer renderer;
+
+    glm::vec3 translationA(0, 0, 0);
+    glm::vec3 translationB(400, 200, 0);
+
+    float r = 0.0f;
+    float increment = 0.01f;
+
+    while (!glfwWindowShouldClose(window))
     {
-      g_CameraCenter += cameraSpeed * cameraFront;
-    }
 
-    if (g_PressedKeys.back)
-    {
-      g_CameraCenter -= cameraSpeed * cameraFront;
-    }
+      renderer.Clear();
 
-    if (g_PressedKeys.left)
-    {
-      glm::vec4 w = -cameraFront / norm(cameraFront);
-      glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
-
-      g_CameraCenter -= cameraSpeed * u;
-    }
-
-    if (g_PressedKeys.right)
-    {
-      glm::vec4 w = -cameraFront / norm(cameraFront);
-      glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
-
-      g_CameraCenter += cameraSpeed * u;
-    }
-
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(program_id);
-
-    glBindVertexArray(vertex_array_object_id);
-
-    glm::mat4 projection;
-
-    float nearplane = -0.1f;
-    float farplane = -10.0f;
-
-    if (g_UsePerspectiveProjection)
-    {
-      float field_of_view = 3.141592 / 3.0f;
-      projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
-    }
-    else
-    {
-      float t = 1.5f * g_CameraDistance / 2.5f;
-      float b = -t;
-      float r = t * g_ScreenRatio;
-      float l = -r;
-      projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
-    }
-
-    glm::mat4 view = Matrix_Camera_View(g_CameraCenter, cameraFront, g_CameraUp);
-
-    glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
-
-    for (int i = 1; i <= 1; ++i)
-    {
-      glm::mat4 model;
-
-      if (i == 1)
       {
-        model = Matrix_Identity();
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+        glm::mat4 mvp = proj * view * model;
+        shader.Bind();
+        shader.SetUniformMat4f("u_MVP", mvp);
+
+        renderer.Draw(va, ib, shader);
       }
 
-      glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+      if (r > 1.0f)
+        increment = -0.01f;
+      else if (r < 0.0f)
+        increment = 0.01f;
 
-      glUniform1i(render_as_black_uniform, false);
+      r += increment;
 
-      glDrawElements(
-          g_VirtualScene["cube_faces"].renderingMode,
-          g_VirtualScene["cube_faces"].indicesNumber,
-          GL_UNSIGNED_INT,
-          (void *)g_VirtualScene["cube_faces"].firstIndex);
+      glfwSwapBuffers(window);
+      glfwPollEvents();
+      // g_DeltaTime = glfwGetTime() - g_LastFrame;
+      // g_LastFrame = glfwGetTime();
 
-      glLineWidth(4.0f);
+      // float x = cos(g_CameraPhi) * sin(g_CameraTheta);
+      // float y = sin(g_CameraPhi);
+      // float z = cos(g_CameraPhi) * cos(g_CameraTheta);
 
-      glDrawElements(
-          g_VirtualScene["axes"].renderingMode,
-          g_VirtualScene["axes"].indicesNumber,
-          GL_UNSIGNED_INT,
-          (void *)g_VirtualScene["axes"].firstIndex);
+      // glm::vec4 cameraFront = glm::normalize(glm::vec4(x, y, z, 0.0f));
 
-      glUniform1i(render_as_black_uniform, true);
+      // float cameraSpeed = 2.5f * g_DeltaTime;
 
-      glDrawElements(
-          g_VirtualScene["cube_edges"].renderingMode,
-          g_VirtualScene["cube_edges"].indicesNumber,
-          GL_UNSIGNED_INT,
-          (void *)g_VirtualScene["cube_edges"].firstIndex);
+      // if (g_PressedKeys.front)
+      // {
+      //   g_CameraCenter += cameraSpeed * cameraFront;
+      // }
 
-      if (i == 3)
-      {
-        glPointSize(15.0f);
-        glDrawArrays(GL_POINTS, 3, 1);
-      }
+      // if (g_PressedKeys.back)
+      // {
+      //   g_CameraCenter -= cameraSpeed * cameraFront;
+      // }
+
+      // if (g_PressedKeys.left)
+      // {
+      //   glm::vec4 w = -cameraFront / norm(cameraFront);
+      //   glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
+
+      //   g_CameraCenter -= cameraSpeed * u;
+      // }
+
+      // if (g_PressedKeys.right)
+      // {
+      //   glm::vec4 w = -cameraFront / norm(cameraFront);
+      //   glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
+
+      //   g_CameraCenter += cameraSpeed * u;
+      // }
+
+      // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+      // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      // glUseProgram(program_id);
+
+      // glBindVertexArray(vertex_array_object_id);
+
+      // glm::mat4 projection;
+
+      // float nearplane = -0.1f;
+      // float farplane = -10.0f;
+
+      // if (g_UsePerspectiveProjection)
+      // {
+      //   float field_of_view = 3.141592 / 3.0f;
+      //   projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+      // }
+      // else
+      // {
+      //   float t = 1.5f * g_CameraDistance / 2.5f;
+      //   float b = -t;
+      //   float r = t * g_ScreenRatio;
+      //   float l = -r;
+      //   projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
+      // }
+
+      // glm::mat4 view = Matrix_Camera_View(g_CameraCenter, cameraFront, g_CameraUp);
+
+      // glUniformMatrix4fv(view_uniform, 1, GL_FALSE, glm::value_ptr(view));
+      // glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
+
+      // for (int i = 1; i <= 1; ++i)
+      // {
+      //   glm::mat4 model;
+
+      //   if (i == 1)
+      //   {
+      //     model = Matrix_Identity();
+      //   }
+
+      //   glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+
+      //   glUniform1i(render_as_black_uniform, false);
+
+      //   glDrawElements(
+      //       g_VirtualScene["cube_faces"].renderingMode,
+      //       g_VirtualScene["cube_faces"].indicesNumber,
+      //       GL_UNSIGNED_INT,
+      //       (void *)g_VirtualScene["cube_faces"].firstIndex);
+
+      //   glLineWidth(4.0f);
+
+      //   glDrawElements(
+      //       g_VirtualScene["axes"].renderingMode,
+      //       g_VirtualScene["axes"].indicesNumber,
+      //       GL_UNSIGNED_INT,
+      //       (void *)g_VirtualScene["axes"].firstIndex);
+
+      //   glUniform1i(render_as_black_uniform, true);
+
+      //   glDrawElements(
+      //       g_VirtualScene["cube_edges"].renderingMode,
+      //       g_VirtualScene["cube_edges"].indicesNumber,
+      //       GL_UNSIGNED_INT,
+      //       (void *)g_VirtualScene["cube_edges"].firstIndex);
+
+      //   if (i == 3)
+      //   {
+      //     glPointSize(15.0f);
+      //     glDrawArrays(GL_POINTS, 3, 1);
+      //   }
+      // }
+
+      // glm::mat4 model = Matrix_Identity();
+
+      // glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+
+      // glLineWidth(10.0f);
+
+      // glUniform1i(render_as_black_uniform, false);
+
+      // glDrawElements(
+      //     g_VirtualScene["axes"].renderingMode,
+      //     g_VirtualScene["axes"].indicesNumber,
+      //     GL_UNSIGNED_INT,
+      //     (void *)g_VirtualScene["axes"].firstIndex);
+
+      // glBindVertexArray(0);
+
+      // glm::vec4 p_model(0.5f, 0.5f, 0.5f, 1.0f);
+
+      // glfwSwapBuffers(window);
+
+      // glfwPollEvents();
     }
-
-    glm::mat4 model = Matrix_Identity();
-
-    glUniformMatrix4fv(model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-
-    glLineWidth(10.0f);
-
-    glUniform1i(render_as_black_uniform, false);
-
-    glDrawElements(
-        g_VirtualScene["axes"].renderingMode,
-        g_VirtualScene["axes"].indicesNumber,
-        GL_UNSIGNED_INT,
-        (void *)g_VirtualScene["axes"].firstIndex);
-
-    glBindVertexArray(0);
-
-    glm::vec4 p_model(0.5f, 0.5f, 0.5f, 1.0f);
-
-    glfwSwapBuffers(window);
-
-    glfwPollEvents();
   }
 
   glfwTerminate();
@@ -742,8 +842,8 @@ void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
   // parâmetros que definem a posição da câmera dentro da cena virtual.
   // Assim, temos que o usuário consegue controlar a câmera.
 
-  // if (!g_LeftMouseButtonPressed)
-  //   return;
+  if (!g_LeftMouseButtonPressed)
+    return;
 
   // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
   float dx = xpos - g_LastCursorPosX;
