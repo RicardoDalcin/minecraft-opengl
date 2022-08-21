@@ -12,6 +12,7 @@
         "-g",
         "${workspaceFolder}/src/core/*.cpp",
         "${workspaceFolder}/src/engine/*.cpp",
+        "${workspaceFolder}/src/world/*.cpp",
         "${workspaceFolder}/src/*.cpp",
         "${workspaceFolder}/external/lib/*.a",
         "${workspaceFolder}/external/lib/*.c",
@@ -24,9 +25,7 @@
         "-lopengl32",
         "-lglu32"
       ],
-      "options": {
-        "cwd": "${fileDirname}"
-      },
+      "options": {},
       "problemMatcher": ["$gcc"],
       "group": {
         "kind": "build",

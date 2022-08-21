@@ -30,6 +30,8 @@
 #include "engine/Texture.hpp"
 #include "engine/Renderer.hpp"
 
+#include "world/Cubes.hpp"
+
 GLuint BuildTriangles();                                                     // Constrói triângulos para renderização
 GLuint LoadShader_Vertex(const char *filename);                              // Carrega um vertex shader
 GLuint LoadShader_Fragment(const char *filename);                            // Carrega um fragment shader
@@ -175,77 +177,145 @@ int main()
     //     400.0f, 400.0f, ((x + 1) * spriteWidth) / sheetWidth, ((y + 1) * spriteHeight) / sheetHeight,
     //     0.0f, 400.0f, (x * spriteWidth) / sheetHeight, ((y + 1) * spriteHeight) / sheetHeight};
 
-    float positions[] = {
-        0.0f, 0.0f, 0.0f, 0.0f,
-        400.0f, 0.0f, 1.0f, 0.0f,
-        400.0f, 400.0f, 1.0f, 1.0f,
-        0.0f, 400.0f, 0.0f, 1.0f};
+    // float positions[] = {
+    //     0.0f, 0.0f, 0.0f, 0.0f,
+    //     400.0f, 0.0f, 1.0f, 0.0f,
+    //     400.0f, 400.0f, 1.0f, 1.0f,
+    //     0.0f, 400.0f, 0.0f, 1.0f};
 
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0};
+    // unsigned int indices[] = {
+    //     0, 1, 2,
+    //     2, 3, 0};
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    // unsigned int vao;
+    // glGenVertexArrays(1, &vao);
+    // glBindVertexArray(vao);
 
-    VertexArray va;
-    VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+    // VertexArray va;
+    // VertexBuffer vb(positions, 4 * 4 * sizeof(float));
 
-    VertexBufferLayout layout;
-    layout.Push(LayoutType::LT_FLOAT, 2);
-    layout.Push(LayoutType::LT_FLOAT, 2);
-    va.AddBuffer(vb, layout);
+    // VertexBufferLayout layout;
+    // layout.Push(LayoutType::LT_FLOAT, 2);
+    // layout.Push(LayoutType::LT_FLOAT, 2);
+    // va.AddBuffer(vb, layout);
 
-    IndexBuffer ib(indices, 6);
+    // IndexBuffer ib(indices, 6);
 
-    glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+    // glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+    // glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
-    Shader shader("src/Basic.shader");
-    shader.Bind();
-    shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+    // Shader shader("src/Basic.shader");
+    // shader.Bind();
+    // shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
 
-    Texture texture("extras/textures/BlockAtlas.png");
-    texture.Bind();
-    shader.SetUniform1i("u_Texture", 0);
+    // Texture texture("extras/textures/BlockAtlas.png");
+    // texture.Bind();
+    // shader.SetUniform1i("u_Texture", 0);
 
-    va.Unbind();
-    vb.Unbind();
-    ib.Unbind();
-    shader.Unbind();
+    // va.Unbind();
+    // vb.Unbind();
+    // ib.Unbind();
+    // shader.Unbind();
+
+    // Renderer renderer;
+
+    // glm::vec3 translationA(0, 0, 0);
+    // glm::vec3 translationB(400, 200, 0);
+
+    // float r = 0.0f;
+    // float increment = 0.01f;
 
     Renderer renderer;
 
-    glm::vec3 translationA(0, 0, 0);
-    glm::vec3 translationB(400, 200, 0);
+    Shader shader("src/Cube.shader");
 
-    float r = 0.0f;
-    float increment = 0.01f;
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    MinecraftClone::Cubes::init(shader);
 
     while (!glfwWindowShouldClose(window))
     {
+      g_DeltaTime = glfwGetTime() - g_LastFrame;
+      g_LastFrame = glfwGetTime();
 
       renderer.Clear();
 
-      {
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-        glm::mat4 mvp = proj * view * model;
-        shader.Bind();
-        shader.SetUniformMat4f("u_MVP", mvp);
+      float x = cos(g_CameraPhi) * sin(g_CameraTheta);
+      float y = sin(g_CameraPhi);
+      float z = cos(g_CameraPhi) * cos(g_CameraTheta);
 
-        renderer.Draw(va, ib, shader);
+      glm::vec4 cameraFront = glm::normalize(glm::vec4(x, y, z, 0.0f));
+
+      float cameraSpeed = 2.5f * g_DeltaTime;
+
+      if (g_PressedKeys.front)
+      {
+        g_CameraCenter += cameraSpeed * cameraFront;
       }
 
-      if (r > 1.0f)
-        increment = -0.01f;
-      else if (r < 0.0f)
-        increment = 0.01f;
+      if (g_PressedKeys.back)
+      {
+        g_CameraCenter -= cameraSpeed * cameraFront;
+      }
 
-      r += increment;
+      if (g_PressedKeys.left)
+      {
+        glm::vec4 w = -cameraFront / norm(cameraFront);
+        glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
+
+        g_CameraCenter -= cameraSpeed * u;
+      }
+
+      if (g_PressedKeys.right)
+      {
+        glm::vec4 w = -cameraFront / norm(cameraFront);
+        glm::vec4 u = crossproduct(g_CameraUp, w) / norm(crossproduct(g_CameraUp, w));
+
+        g_CameraCenter += cameraSpeed * u;
+      }
+
+      glm::mat4 projection;
+
+      float nearplane = -0.1f;
+      float farplane = -50.0f;
+
+      if (g_UsePerspectiveProjection)
+      {
+        float field_of_view = 3.141592 / 3.0f;
+        projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+      }
+      else
+      {
+        float t = 1.5f * g_CameraDistance / 2.5f;
+        float b = -t;
+        float r = t * g_ScreenRatio;
+        float l = -r;
+        projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
+      }
+
+      glm::mat4 view = Matrix_Camera_View(g_CameraCenter, cameraFront, g_CameraUp);
+
+      MinecraftClone::Cubes::update(g_DeltaTime, shader, view, projection);
+
+      // {
+      //   glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+      //   glm::mat4 mvp = proj * view * model;
+      //   shader.Bind();
+      //   shader.SetUniformMat4f("u_MVP", mvp);
+
+      //   renderer.Draw(va, ib, shader);
+      // }
+
+      // if (r > 1.0f)
+      //   increment = -0.01f;
+      // else if (r < 0.0f)
+      //   increment = 0.01f;
+
+      // r += increment;
 
       glfwSwapBuffers(window);
       glfwPollEvents();
