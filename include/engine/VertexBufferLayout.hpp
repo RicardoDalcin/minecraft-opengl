@@ -51,7 +51,7 @@ public:
 		unsigned int glType;
 		unsigned char normalized;
 
-		switch (glType)
+		switch (type)
 		{
 		case LayoutType::LT_FLOAT:
 			glType = GL_FLOAT;

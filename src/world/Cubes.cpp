@@ -255,7 +255,7 @@ namespace MinecraftClone
       // {
       // if (filepath.path().stem().string() != "normal")
       // {
-      textures.push_back(createTexture("extras/textures/chiseled_stone_bricks.png", true));
+      textures.push_back(createTexture("extras/textures/atlas.png", true));
       //   }
       // }
 

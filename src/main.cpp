@@ -31,6 +31,7 @@
 #include "engine/Renderer.hpp"
 
 #include "world/Cubes.hpp"
+#include "world/Chunk.hpp"
 
 GLuint BuildTriangles();                                                     // Constrói triângulos para renderização
 GLuint LoadShader_Vertex(const char *filename);                              // Carrega um vertex shader
@@ -235,7 +236,9 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    MinecraftClone::Cubes::init(shader);
+    // MinecraftClone::Cubes::init(shader);
+
+    Chunk defaultChunk(&shader);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -299,7 +302,8 @@ int main()
 
       glm::mat4 view = Matrix_Camera_View(g_CameraCenter, cameraFront, g_CameraUp);
 
-      MinecraftClone::Cubes::update(g_DeltaTime, shader, view, projection);
+      // MinecraftClone::Cubes::update(g_DeltaTime, shader, view, projection);
+      defaultChunk.Draw(view, projection);
 
       // {
       //   glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
