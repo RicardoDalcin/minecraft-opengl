@@ -13,8 +13,7 @@ private:
   static const int CHUNK_HEIGHT = 4;
 
   Shader *m_Shader;
-  std::array<Texture *, 3> m_Textures;
-  Texture *m_NormalTexture;
+  Texture *m_TextureAtlas;
   std::array<Cube *, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT> m_Cubes;
 
 public:

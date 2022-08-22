@@ -10,6 +10,8 @@
 #include "engine/VertexBuffer.hpp"
 #include "engine/VertexBufferLayout.hpp"
 
+#include "world/BlockDatabase.hpp"
+
 struct CubeVertex
 {
   glm::vec4 position;
@@ -22,7 +24,7 @@ class Cube
 private:
   glm::vec3 m_Position;
   const Texture *m_Texture;
-  int m_TextureIndex;
+  TextureInfo m_TextureReference;
   Shader *m_Shader;
 
   std::array<CubeVertex, 36> m_Vertices;
@@ -35,7 +37,7 @@ private:
   const std::array<glm::vec4, 6> m_Normals;
 
 public:
-  Cube(glm::vec4 position, const Texture *texture, int textureIndex, Shader *shader);
+  Cube(glm::vec4 position, const Texture *texture, TextureInfo textureReference, Shader *shader);
   ~Cube();
 
   void Draw(glm::mat4 view, glm::mat4 projection);

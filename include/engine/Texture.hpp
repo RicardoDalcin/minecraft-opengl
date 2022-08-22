@@ -12,7 +12,7 @@ private:
   int m_Width, m_Height, m_BPP;
 
 public:
-  Texture(const std::string &filePath);
+  Texture(const std::string &filePath, bool pixelated = false);
   ~Texture();
 
   void Bind(unsigned int slot = 0) const;
