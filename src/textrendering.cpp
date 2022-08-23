@@ -11,7 +11,7 @@
 #include "core/utils.hpp"
 #include "dejavufont.h"
 
-GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp
+// GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp
 
 const GLchar *const textvertexshader_source = ""
                                               "#version 330\n"
@@ -109,7 +109,7 @@ void TextRendering_Init()
     TextRendering_LoadShader(textfragmentshader_source, textfragmentshader_id);
     glCheckError();
 
-    textprogram_id = CreateGpuProgram(textvertexshader_id, textfragmentshader_id);
+    // textprogram_id = CreateGpuProgram(textvertexshader_id, textfragmentshader_id);
     glLinkProgram(textprogram_id);
     glCheckError();
 
