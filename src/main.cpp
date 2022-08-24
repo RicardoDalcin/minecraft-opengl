@@ -33,7 +33,6 @@
 #include "entity/Camera.hpp"
 #include "entity/Input.hpp"
 
-#include "world/Cubes.hpp"
 #include "world/Chunk.hpp"
 
 void FramebufferSizeCallback(GLFWwindow *window, int width, int height);

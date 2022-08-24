@@ -19,24 +19,17 @@ Chunk::Chunk(Shader *shader)
     {
       for (int z = 0; z < CHUNK_SIZE; z++)
       {
-        if (x % 2 == 0 && y % 2 == 0 && z % 2 != 0)
-        {
-          int randomBlockIndex = rand() % 50;
+        int randomBlockIndex = rand() % 50;
 
-          BlockInformation randomBlock = BlockDatabase::GetBlockInformationIndex(randomBlockIndex);
-          // BlockInformation randomBlock = BlockDatabase::GetBlockInformation(y == CHUNK_HEIGHT - 1 ? "grass" : "dirt");
+        BlockInformation randomBlock = BlockDatabase::GetBlockInformationIndex(randomBlockIndex);
+        // BlockInformation randomBlock = BlockDatabase::GetBlockInformation(y == CHUNK_HEIGHT - 1 ? "grass" : "dirt");
 
-          m_Cubes[x][y][z] =
-              new Cube(
-                  glm::vec4(x, y, z, 1.0f),
-                  m_TextureAtlas,
-                  randomBlock.textureReference,
-                  m_Shader);
-        }
-        else
-        {
-          m_Cubes[x][y][z] = NULL;
-        }
+        m_Cubes[x][y][z] =
+            new Cube(
+                glm::vec4(x, y, z, 1.0f),
+                m_TextureAtlas,
+                randomBlock.textureReference,
+                m_Shader);
       }
     }
   }
