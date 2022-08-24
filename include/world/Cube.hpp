@@ -40,6 +40,9 @@ public:
   Cube(glm::vec4 position, const Texture *texture, TextureInfo textureReference, Shader *shader);
   ~Cube();
 
+  glm::vec3 GetPosition() const { return m_Position; }
+  std::array<CubeVertex, 36> GetVertices() const { return m_Vertices; }
+
   void Draw(glm::mat4 view, glm::mat4 projection);
 };
 
