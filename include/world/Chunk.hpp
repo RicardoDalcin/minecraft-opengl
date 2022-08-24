@@ -14,12 +14,12 @@ class Chunk
 {
 private:
   static const int CHUNK_SIZE = 16;
-  static const int CHUNK_HEIGHT = 4;
+  static const int CHUNK_HEIGHT = 64;
 
   VertexArray *m_VAO;
   VertexBuffer *m_VBO;
 
-  std::vector<CubeVertex> m_Vertices;
+  int m_MeshVertexCount;
 
   Shader *m_Shader;
   Texture *m_TextureAtlas;
@@ -28,6 +28,8 @@ private:
 public:
   Chunk(Shader *shader);
   ~Chunk();
+
+  void BuildMesh();
 
   void Draw(glm::mat4 view, glm::mat4 projection);
 };
