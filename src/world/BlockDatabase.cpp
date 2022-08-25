@@ -15,17 +15,14 @@ void BlockDatabase::Initialize()
     block.textureReference = blockBase.textureReference;
     block.textureCoordinates = {};
 
-    int horizontalTextureCount = 32;
-    int verticalTextureCount = 11;
+    int textureIndexX = blockBase.textureReference.face % HORIZONTAL_TEXTURE_COUNT;
+    int textureIndexY = ceil(blockBase.textureReference.face / HORIZONTAL_TEXTURE_COUNT);
 
-    int textureIndexX = blockBase.textureReference.face % horizontalTextureCount;
-    int textureIndexY = ceil(blockBase.textureReference.face / horizontalTextureCount);
-
-    float unitX = 1.0f / horizontalTextureCount;
-    float unitY = 1.0f / verticalTextureCount;
+    float unitX = 1.0f / HORIZONTAL_TEXTURE_COUNT;
+    float unitY = 1.0f / VERTICAL_TEXTURE_COUNT;
 
     float textureZeroX = unitX * textureIndexX;
-    float textureZeroY = unitY * ((verticalTextureCount - 1) - textureIndexY);
+    float textureZeroY = unitY * ((VERTICAL_TEXTURE_COUNT - 1) - textureIndexY);
 
     float textureOneX = textureZeroX + unitX;
     float textureOneY = textureZeroY + unitY;
@@ -39,11 +36,11 @@ void BlockDatabase::Initialize()
     block.textureCoordinates[3] = glm::vec2(textureOneX, textureZeroY);
     block.textureCoordinates[5] = glm::vec2(textureZeroX, textureZeroY);
 
-    textureIndexX = blockBase.textureReference.side % horizontalTextureCount;
-    textureIndexY = ceil(blockBase.textureReference.side / horizontalTextureCount);
+    textureIndexX = blockBase.textureReference.side % HORIZONTAL_TEXTURE_COUNT;
+    textureIndexY = ceil(blockBase.textureReference.side / HORIZONTAL_TEXTURE_COUNT);
 
     textureZeroX = unitX * textureIndexX;
-    textureZeroY = unitY * ((verticalTextureCount - 1) - textureIndexY);
+    textureZeroY = unitY * ((VERTICAL_TEXTURE_COUNT - 1) - textureIndexY);
 
     textureOneX = textureZeroX + unitX;
     textureOneY = textureZeroY + unitY;
@@ -73,11 +70,11 @@ void BlockDatabase::Initialize()
     block.textureCoordinates[21] = glm::vec2(textureOneX, textureZeroY);
     block.textureCoordinates[23] = glm::vec2(textureZeroX, textureZeroY);
 
-    textureIndexX = blockBase.textureReference.top % horizontalTextureCount;
-    textureIndexY = ceil(blockBase.textureReference.top / horizontalTextureCount);
+    textureIndexX = blockBase.textureReference.top % HORIZONTAL_TEXTURE_COUNT;
+    textureIndexY = ceil(blockBase.textureReference.top / HORIZONTAL_TEXTURE_COUNT);
 
     textureZeroX = unitX * textureIndexX;
-    textureZeroY = unitY * ((verticalTextureCount - 1) - textureIndexY);
+    textureZeroY = unitY * ((VERTICAL_TEXTURE_COUNT - 1) - textureIndexY);
 
     textureOneX = textureZeroX + unitX;
     textureOneY = textureZeroY + unitY;
@@ -90,11 +87,11 @@ void BlockDatabase::Initialize()
     block.textureCoordinates[27] = glm::vec2(textureOneX, textureZeroY);
     block.textureCoordinates[29] = glm::vec2(textureZeroX, textureZeroY);
 
-    textureIndexX = blockBase.textureReference.bottom % horizontalTextureCount;
-    textureIndexY = ceil(blockBase.textureReference.bottom / horizontalTextureCount);
+    textureIndexX = blockBase.textureReference.bottom % HORIZONTAL_TEXTURE_COUNT;
+    textureIndexY = ceil(blockBase.textureReference.bottom / HORIZONTAL_TEXTURE_COUNT);
 
     textureZeroX = unitX * textureIndexX;
-    textureZeroY = unitY * ((verticalTextureCount - 1) - textureIndexY);
+    textureZeroY = unitY * ((VERTICAL_TEXTURE_COUNT - 1) - textureIndexY);
 
     textureOneX = textureZeroX + unitX;
     textureOneY = textureZeroY + unitY;

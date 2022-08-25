@@ -250,6 +250,9 @@ class BlockDatabase
 private:
   BlockDatabase() {}
 
+  static const int HORIZONTAL_TEXTURE_COUNT = 32;
+  static const int VERTICAL_TEXTURE_COUNT = 11;
+
   static BlockInformation blockInformation[BLOCK_COUNT];
 
 public:
