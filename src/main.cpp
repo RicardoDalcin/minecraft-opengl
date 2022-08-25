@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <chrono>
+
 #include <map>
 #include <string>
 #include <limits>
@@ -34,7 +36,8 @@
 #include "entity/Input.hpp"
 #include "entity/Window.hpp"
 
-#include "world/Chunk.hpp"
+// #include "world/Chunk.hpp"
+#include "world/World.hpp"
 
 int main()
 {
@@ -62,7 +65,15 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    Chunk defaultChunk(&shader);
+    // Chunk defaultChunk(&shader);
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+    World world(&shader);
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    printf("Elapsed time: %f \n", (float)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     while (!Window::GetShouldClose())
     {
@@ -95,6 +106,16 @@ int main()
 
       float cameraSpeed = baseSpeed * Window::GetDeltaTime();
 
+      if (Input::isKeyPressed(GLFW_KEY_O))
+      {
+        camera.useOrthographic();
+      }
+
+      if (Input::isKeyPressed(GLFW_KEY_P))
+      {
+        camera.usePerspective();
+      }
+
       glm::vec4 newCameraPosition = camera.getPosition();
       if (Input::isKeyPressed(GLFW_KEY_W))
       {
@@ -118,7 +139,8 @@ int main()
 
       camera.updatePosition(newCameraPosition);
 
-      defaultChunk.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
+      // defaultChunk.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
+      world.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
 
       Window::EndFrame();
     }

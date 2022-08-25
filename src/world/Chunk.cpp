@@ -125,7 +125,7 @@ void Chunk::BuildMesh()
   m_MeshVertexCount = vertices.size();
 }
 
-void Chunk::Draw(glm::mat4 view, glm::mat4 projection)
+void Chunk::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
 {
   m_Shader->Bind();
 
@@ -134,8 +134,8 @@ void Chunk::Draw(glm::mat4 view, glm::mat4 projection)
 
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  glm::mat4 transform = Matrix_Identity();
-  m_Shader->SetUniformMat4f("uTransform", transform);
+  // glm::mat4 transform = Matrix_Identity();
+  m_Shader->SetUniformMat4f("uTransform", model);
 
   m_TextureAtlas->Bind(0);
   m_Shader->SetUniform1i("uTexture", 0);

@@ -29,14 +29,18 @@ bool Window::Init()
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+  // const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-  int width = mode->width;
-  int height = mode->height;
+  // int width = mode->width;
+  // int height = mode->height;
+
+  int width = 1280;
+  int height = 720;
 
   screenRatio = (float)width / height;
 
-  window = glfwCreateWindow(width, height, "Minecraft", glfwGetPrimaryMonitor(), NULL);
+  // window = glfwCreateWindow(width, height, "Minecraft", glfwGetPrimaryMonitor(), NULL);
+  window = glfwCreateWindow(width, height, "Minecraft", NULL, NULL);
   if (!window)
   {
     glfwTerminate();

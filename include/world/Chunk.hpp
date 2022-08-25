@@ -12,10 +12,11 @@
 
 class Chunk
 {
-private:
+public:
   static const int CHUNK_SIZE = 16;
   static const int CHUNK_HEIGHT = 64;
 
+private:
   VertexArray *m_VAO;
   VertexBuffer *m_VBO;
 
@@ -31,7 +32,7 @@ public:
 
   void BuildMesh();
 
-  void Draw(glm::mat4 view, glm::mat4 projection);
+  void Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 };
 
 #endif
