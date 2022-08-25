@@ -4,6 +4,8 @@
 #include <array>
 #include <string>
 
+#include <glm/glm.hpp>
+
 const int STONE = 0;
 const int ANDESITE = 1;
 const int DIRT = 2;
@@ -173,15 +175,22 @@ const TextureInfo CHISELED_STONE_BRICK_TEXTURE = {CHISELED_STONE_BRICK, CHISELED
 const TextureInfo CRAFTING_TABLE_TEXTURE = {CRAFTING_TABLE_FACE, CRAFTING_TABLE_SIDE, CRAFTING_TABLE_TOP, OAK_PLANK};
 const TextureInfo FURNACE_TEXTURE = {FURNACE_FACE, FURNACE_SIDE, FURNACE_TOP, FURNACE_TOP};
 
-struct BlockInformation
+struct BlockBaseInformation
 {
   std::string blockId;
   TextureInfo textureReference;
 };
 
+struct BlockInformation
+{
+  std::string blockId;
+  TextureInfo textureReference;
+  std::array<glm::vec2, 36> textureCoordinates;
+};
+
 const int BLOCK_COUNT = 52;
 
-const BlockInformation BLOCK_ATLAS[BLOCK_COUNT] = {
+const BlockBaseInformation BLOCK_ATLAS[BLOCK_COUNT] = {
     {"stone", STONE_TEXTURE},
     {"andesite", ANDESITE_TEXTURE},
     {"dirt", DIRT_TEXTURE},
@@ -241,7 +250,11 @@ class BlockDatabase
 private:
   BlockDatabase() {}
 
+  static BlockInformation blockInformation[BLOCK_COUNT];
+
 public:
+  static void Initialize();
+
   static BlockInformation GetBlockInformation(std::string blockId);
   static BlockInformation GetBlockInformationIndex(int index);
 };

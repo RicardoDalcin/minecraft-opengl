@@ -37,6 +37,7 @@
 #include "entity/Window.hpp"
 
 // #include "world/Chunk.hpp"
+#include "world/BlockDatabase.hpp"
 #include "world/World.hpp"
 
 int main()
@@ -66,6 +67,8 @@ int main()
     glEnable(GL_CULL_FACE);
 
     // Chunk defaultChunk(&shader);
+
+    BlockDatabase::Initialize();
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 

@@ -10,7 +10,7 @@ World::World(Shader *shader)
   {
     for (int z = 0; z < CHUNKS_PER_AXIS; z++)
     {
-      m_Chunks[x][z] = new Chunk(shader);
+      m_Chunks[x][z] = new Chunk();
     }
   }
 }
@@ -28,12 +28,24 @@ World::~World()
 
 void World::Draw(glm::mat4 view, glm::mat4 projection)
 {
+  m_Shader->Bind();
+
+  m_Shader->SetUniformMat4f("uView", view);
+  m_Shader->SetUniformMat4f("uProjection", projection);
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  m_TextureAtlas->Bind(0);
+  m_Shader->SetUniform1i("uTexture", 0);
+
   for (int x = 0; x < CHUNKS_PER_AXIS; x++)
   {
     for (int z = 0; z < CHUNKS_PER_AXIS; z++)
     {
       glm::mat4 model = Matrix_Translate(x * Chunk::CHUNK_SIZE, 0.0f, z * Chunk::CHUNK_SIZE);
-      m_Chunks[x][z]->Draw(model, view, projection);
+
+      m_Shader->SetUniformMat4f("uTransform", model);
+
+      m_Chunks[x][z]->Draw();
     }
   }
 }

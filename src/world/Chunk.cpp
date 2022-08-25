@@ -5,14 +5,10 @@
 
 #include "world/BlockDatabase.hpp"
 
-Chunk::Chunk(Shader *shader)
+Chunk::Chunk()
     : m_VAO(NULL),
-      m_VBO(NULL),
-      m_Shader(shader),
-      m_TextureAtlas(new Texture("extras/textures/atlas.png", true))
+      m_VBO(NULL)
 {
-  m_Shader->Bind();
-
   for (int x = 0; x < CHUNK_SIZE; x++)
   {
     for (int y = 0; y < CHUNK_HEIGHT; y++)
@@ -24,12 +20,7 @@ Chunk::Chunk(Shader *shader)
         BlockInformation randomBlock = BlockDatabase::GetBlockInformationIndex(randomBlockIndex);
         // BlockInformation randomBlock = BlockDatabase::GetBlockInformation(y == CHUNK_HEIGHT - 1 ? "grass" : "dirt");
 
-        m_Cubes[x][y][z] =
-            new Cube(
-                glm::vec4(x, y, z, 1.0f),
-                m_TextureAtlas,
-                randomBlock.textureReference,
-                m_Shader);
+        m_Cubes[x][y][z] = new Cube(glm::vec4(x, y, z, 1.0f), randomBlock.textureReference, randomBlock.textureCoordinates);
       }
     }
   }
@@ -49,8 +40,6 @@ Chunk::~Chunk()
       }
     }
   }
-
-  delete m_TextureAtlas;
 }
 
 void Chunk::BuildMesh()
@@ -74,8 +63,6 @@ void Chunk::BuildMesh()
 
         if (cube != NULL)
         {
-          glm::vec3 cubePosition = cube->GetPosition();
-
           bool hasBlockInFront = z + 1 < CHUNK_SIZE && m_Cubes[x][y][z + 1] != NULL;
           bool hasBlockInRight = x + 1 < CHUNK_SIZE && m_Cubes[x + 1][y][z] != NULL;
           bool hasBlockInBack = z - 1 >= 0 && m_Cubes[x][y][z - 1] != NULL;
@@ -91,19 +78,8 @@ void Chunk::BuildMesh()
               hasBlockInTop,
               hasBlockInBottom};
 
-          std::array<CubeVertex, 36> cubeVertices = cube->GetVertices();
-
-          for (int index = 0; index < 36; index++)
-            if (!occlusion[floorf(index / 6)])
-            {
-              CubeVertex vertex = cubeVertices[index];
-              CubeVertex transformedVertex = {
-                  glm::vec4(cubePosition.x + vertex.position.x, cubePosition.y + vertex.position.y, cubePosition.z + vertex.position.z, 0.0f),
-                  vertex.textureCoords,
-                  vertex.normal,
-              };
-              vertices.push_back(transformedVertex);
-            }
+          std::vector<CubeVertex> visibleVertices = cube->GetVisibleVertices(occlusion);
+          vertices.insert(vertices.end(), visibleVertices.begin(), visibleVertices.end());
         }
       }
     }
@@ -125,21 +101,8 @@ void Chunk::BuildMesh()
   m_MeshVertexCount = vertices.size();
 }
 
-void Chunk::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+void Chunk::Draw()
 {
-  m_Shader->Bind();
-
-  m_Shader->SetUniformMat4f("uView", view);
-  m_Shader->SetUniformMat4f("uProjection", projection);
-
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-  // glm::mat4 transform = Matrix_Identity();
-  m_Shader->SetUniformMat4f("uTransform", model);
-
-  m_TextureAtlas->Bind(0);
-  m_Shader->SetUniform1i("uTexture", 0);
-
   m_VAO->Bind();
 
   glDrawArrays(GL_TRIANGLES, 0, m_MeshVertexCount);

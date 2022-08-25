@@ -23,27 +23,28 @@ class Cube
 {
 private:
   glm::vec3 m_Position;
-  const Texture *m_Texture;
   TextureInfo m_TextureReference;
-  Shader *m_Shader;
+  std::array<glm::vec2, 36> m_TextureCoords;
 
   std::array<CubeVertex, 36> m_Vertices;
 
-  VertexArray *m_VAO;
-  VertexBuffer *m_VBO;
+  // VertexArray *m_VAO;
+  // VertexBuffer *m_VBO;
 
-  const std::array<uint32_t, 36>
-      m_Elements;
-  const std::array<glm::vec4, 6> m_Normals;
+  // const std::array<uint32_t, 36>
+  //     m_Elements;
+  // const std::array<glm::vec4, 6> m_Normals;
 
 public:
-  Cube(glm::vec4 position, const Texture *texture, TextureInfo textureReference, Shader *shader);
+  Cube(glm::vec4 position, TextureInfo textureReference, std::array<glm::vec2, 36> textureCoords);
   ~Cube();
 
   glm::vec3 GetPosition() const { return m_Position; }
   std::array<CubeVertex, 36> GetVertices() const { return m_Vertices; }
 
-  void Draw(glm::mat4 view, glm::mat4 projection);
+  // void Draw(glm::mat4 view, glm::mat4 projection);
+
+  std::vector<CubeVertex> GetVisibleVertices(std::array<bool, 6> occludedFaces);
 };
 
 #endif

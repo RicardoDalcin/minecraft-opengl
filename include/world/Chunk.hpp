@@ -22,17 +22,15 @@ private:
 
   int m_MeshVertexCount;
 
-  Shader *m_Shader;
-  Texture *m_TextureAtlas;
   std::array<std::array<std::array<Cube *, CHUNK_SIZE>, CHUNK_HEIGHT>, CHUNK_SIZE> m_Cubes;
 
 public:
-  Chunk(Shader *shader);
+  Chunk();
   ~Chunk();
 
   void BuildMesh();
 
-  void Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+  void Draw();
 };
 
 #endif
