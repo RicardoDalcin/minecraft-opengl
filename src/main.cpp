@@ -60,7 +60,7 @@ int main()
   {
     Renderer renderer;
 
-    Camera camera(-0.1f, -50.0f, 3.141592 / 3.0f);
+    Camera camera(-0.1f, -1024.0f, 3.141592 / 3.0f);
     Shader shader("src/Cube.shader");
 
     glEnable(GL_DEPTH_TEST);

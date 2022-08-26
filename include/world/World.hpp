@@ -9,7 +9,7 @@
 class World
 {
 private:
-  static const int CHUNKS_PER_AXIS = 2;
+  static const int CHUNKS_PER_AXIS = 8;
 
   Shader *m_Shader;
   Texture *m_TextureAtlas;
