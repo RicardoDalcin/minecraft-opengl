@@ -45,6 +45,8 @@ public:
   // void Draw(glm::mat4 view, glm::mat4 projection);
 
   std::vector<CubeVertex> GetVisibleVertices(std::array<bool, 6> occludedFaces);
+
+  static std::vector<CubeVertex> GetVisibleVertices(glm::vec3 position, std::array<glm::vec2, 36> vertices, std::array<bool, 6> occludedFaces);
 };
 
 #endif

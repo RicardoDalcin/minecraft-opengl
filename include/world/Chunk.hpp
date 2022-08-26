@@ -22,7 +22,7 @@ private:
 
   int m_MeshVertexCount;
 
-  std::array<std::array<std::array<Cube *, CHUNK_SIZE>, CHUNK_HEIGHT>, CHUNK_SIZE> m_Cubes;
+  std::array<std::array<std::array<int, CHUNK_SIZE>, CHUNK_HEIGHT>, CHUNK_SIZE> m_Cubes;
 
 public:
   Chunk();
