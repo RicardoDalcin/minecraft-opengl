@@ -9,7 +9,7 @@ private:
 
   bool m_UsePerspective = true;
 
-  glm::vec4 m_CameraCenter = glm::vec4(0.0f, -5.0f, -3.0f, 1.0f);
+  glm::vec4 m_CameraCenter = glm::vec4(0.0f, 64.0f, -3.0f, 1.0f);
   glm::vec4 m_CameraFront;
   glm::vec4 m_CameraRight;
 

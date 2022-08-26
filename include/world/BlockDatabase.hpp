@@ -103,6 +103,8 @@ const int FURNACE_TOP = 163;
 const int FURNACE_SIDE = 164;
 const int FURNACE_FACE = 165;
 
+const int WATER_TOP = 97;
+
 struct TextureInfo
 {
   int face;
@@ -176,6 +178,8 @@ const TextureInfo CHISELED_STONE_BRICK_TEXTURE = {CHISELED_STONE_BRICK_SIDE, CHI
 const TextureInfo CRAFTING_TABLE_TEXTURE = {CRAFTING_TABLE_FACE, CRAFTING_TABLE_SIDE, CRAFTING_TABLE_TOP, OAK_PLANK_SIDE};
 const TextureInfo FURNACE_TEXTURE = {FURNACE_FACE, FURNACE_SIDE, FURNACE_TOP, FURNACE_TOP};
 
+const TextureInfo WATER_TEXTURE = {-1, -1, WATER_TOP, -1};
+
 struct BlockBaseInformation
 {
   std::string blockId;
@@ -191,7 +195,7 @@ struct BlockInformation
   std::array<glm::vec2, 36> textureCoordinates;
 };
 
-const int BLOCK_COUNT = 53;
+const int BLOCK_COUNT = 54;
 
 const BlockBaseInformation BLOCK_ATLAS[BLOCK_COUNT] = {
     {"air", AIR_TEXTURE, false, false},
@@ -247,6 +251,7 @@ const BlockBaseInformation BLOCK_ATLAS[BLOCK_COUNT] = {
     {"chiseled_stone_brick", CHISELED_STONE_BRICK_TEXTURE, true, true},
     {"crafting_table", CRAFTING_TABLE_TEXTURE, true, true},
     {"furnace", FURNACE_TEXTURE, true, true},
+    {"water", WATER_TEXTURE, false, false},
 };
 
 const int AIR = 0;
@@ -302,6 +307,7 @@ const int CRACKED_STONE_BRICK = 49;
 const int CHISELED_STONE_BRICK = 50;
 const int CRAFTING_TABLE = 51;
 const int FURNACE = 52;
+const int WATER = 53;
 
 class BlockDatabase
 {
