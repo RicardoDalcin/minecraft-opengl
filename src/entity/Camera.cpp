@@ -4,7 +4,7 @@
 
 float g_Ratio = 16.0f / 9.0f;
 
-Camera::Camera(float nearplane = -0.1f, float farplane = -50.0f, float fieldOfView = 3.141592 / 3.0f)
+Camera::Camera(float nearplane = -0.1f, float farplane = -620.0f, float fieldOfView = 3.141592 / 3.0f)
     : m_Nearplane(nearplane),
       m_Farplane(farplane),
       m_FOV(fieldOfView)

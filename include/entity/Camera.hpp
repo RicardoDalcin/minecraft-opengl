@@ -5,7 +5,7 @@ class Camera
 private:
   float m_CameraTheta = 3.141592f / 4; // Ângulo no plano ZX em relação ao eixo Z
   float m_CameraPhi = 3.141592f / 6;   // Ângulo em relação ao eixo Y
-  float m_CameraDistance = 50.0f;      // Distância da câmera para a origem
+  float m_CameraDistance = 160.0f;     // Distância da câmera para a origem
 
   bool m_UsePerspective = true;
 
