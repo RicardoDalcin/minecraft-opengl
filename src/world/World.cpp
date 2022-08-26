@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "world/World.hpp"
 
 #include "core/matrices.hpp"
@@ -10,7 +12,7 @@ World::World(Shader *shader)
   {
     for (int z = 0; z < CHUNKS_PER_AXIS; z++)
     {
-      m_Chunks[x][z] = new Chunk();
+      m_Chunks[x][z] = new Chunk(x, z);
     }
   }
 }
@@ -44,7 +46,7 @@ void World::UpdateMeshes()
   }
 }
 
-void World::Draw(glm::mat4 view, glm::mat4 projection)
+void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
 {
   m_Shader->Bind();
 
@@ -56,15 +58,34 @@ void World::Draw(glm::mat4 view, glm::mat4 projection)
   m_TextureAtlas->Bind(0);
   m_Shader->SetUniform1i("uTexture", 0);
 
+  glm::vec4 cameraPosition = camera->getPosition();
+
+  std::vector<std::pair<float, Chunk *>> chunks;
+
   for (int x = 0; x < CHUNKS_PER_AXIS; x++)
   {
     for (int z = 0; z < CHUNKS_PER_AXIS; z++)
     {
-      glm::mat4 model = Matrix_Translate(x * Chunk::CHUNK_SIZE, 0.0f, z * Chunk::CHUNK_SIZE);
+      Chunk *chunk = m_Chunks[x][z];
 
-      m_Shader->SetUniformMat4f("uTransform", model);
+      float distance = glm::distance(glm::vec2(cameraPosition.x, cameraPosition.z), glm::vec2(x * Chunk::CHUNK_SIZE, z * Chunk::CHUNK_SIZE));
 
-      m_Chunks[x][z]->Draw();
+      chunks.push_back(std::make_pair(distance, chunk));
     }
+  }
+
+  std::sort(chunks.begin(), chunks.end(), [](const std::pair<float, Chunk *> &a, const std::pair<float, Chunk *> &b)
+            { return a.first > b.first; });
+
+  for (auto &chunk : chunks)
+  {
+    int chunkX = chunk.second->GetChunkX();
+    int chunkZ = chunk.second->GetChunkZ();
+
+    glm::mat4 model = Matrix_Translate(chunkX * Chunk::CHUNK_SIZE, 0.0f, chunkZ * Chunk::CHUNK_SIZE);
+
+    m_Shader->SetUniformMat4f("uTransform", model);
+
+    chunk.second->Draw();
   }
 }

@@ -66,8 +66,6 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    // Chunk defaultChunk(&shader);
-
     BlockDatabase::Initialize();
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -145,7 +143,7 @@ int main()
       camera.updatePosition(newCameraPosition);
 
       // defaultChunk.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
-      world.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
+      world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
 
       Window::EndFrame();
     }

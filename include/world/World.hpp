@@ -4,6 +4,8 @@
 #include "engine/Shader.hpp"
 #include "engine/Texture.hpp"
 
+#include "entity/Camera.hpp"
+
 #include "world/Chunk.hpp"
 
 class World
@@ -21,7 +23,7 @@ public:
   ~World();
 
   void UpdateMeshes();
-  void Draw(glm::mat4 view, glm::mat4 projection);
+  void Draw(Camera *camera, glm::mat4 view, glm::mat4 projection);
 };
 
 #endif

@@ -14,6 +14,8 @@ void BlockDatabase::Initialize()
     block.blockId = blockBase.blockId;
     block.textureReference = blockBase.textureReference;
     block.textureCoordinates = {};
+    block.isOpaque = blockBase.isOpaque;
+    block.isSolid = blockBase.isSolid;
 
     int textureIndexX = blockBase.textureReference.face % HORIZONTAL_TEXTURE_COUNT;
     int textureIndexY = ceil(blockBase.textureReference.face / HORIZONTAL_TEXTURE_COUNT);

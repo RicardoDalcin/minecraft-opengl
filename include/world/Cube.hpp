@@ -46,7 +46,7 @@ public:
 
   std::vector<CubeVertex> GetVisibleVertices(std::array<bool, 6> occludedFaces);
 
-  static std::vector<CubeVertex> GetVisibleVertices(glm::vec3 position, std::array<glm::vec2, 36> vertices, std::array<bool, 6> occludedFaces);
+  static std::vector<CubeVertex> GetVisibleVertices(int blockIndex, glm::vec3 position, std::array<glm::vec2, 36> vertices, std::array<bool, 6> occludedFaces);
 };
 
 #endif

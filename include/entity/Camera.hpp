@@ -1,4 +1,9 @@
+#ifndef _CAMERA_H
+#define _CAMERA_H
+
 #include <glm/glm.hpp>
+
+#include "core/matrices.hpp"
 
 class Camera
 {
@@ -52,3 +57,5 @@ public:
   glm::mat4 computeViewMatrix() const;
   glm::mat4 computeProjectionMatrix() const;
 };
+
+#endif

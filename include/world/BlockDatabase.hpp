@@ -193,6 +193,8 @@ struct BlockInformation
   std::string blockId;
   TextureInfo textureReference;
   std::array<glm::vec2, 36> textureCoordinates;
+  bool isOpaque;
+  bool isSolid;
 };
 
 const int BLOCK_COUNT = 54;

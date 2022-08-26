@@ -63,22 +63,25 @@ std::vector<CubeVertex> Cube::GetVisibleVertices(std::array<bool, 6> occludedFac
   return visibleVertices;
 }
 
-std::vector<CubeVertex> Cube::GetVisibleVertices(glm::vec3 position, std::array<glm::vec2, 36> textureCoords, std::array<bool, 6> occludedFaces)
+std::vector<CubeVertex> Cube::GetVisibleVertices(int blockIndex, glm::vec3 position, std::array<glm::vec2, 36> textureCoords, std::array<bool, 6> occludedFaces)
 {
   std::vector<CubeVertex> visibleVertices;
 
   for (int index = 0; index < 36; index++)
-    if (!occludedFaces[floorf(index / 6)])
+    if (blockIndex != WATER || (blockIndex == WATER && index / 6 == 4))
     {
-      CubeVertex vertex = {};
+      if (!occludedFaces[floorf(index / 6)])
+      {
+        CubeVertex vertex = {};
 
-      glm::vec4 vertexPosition = VERTEX_POSITIONS[ELEMENTS[index]];
+        glm::vec4 vertexPosition = VERTEX_POSITIONS[ELEMENTS[index]];
 
-      vertex.position = glm::vec4(position.x + vertexPosition.x, position.y + vertexPosition.y, position.z + vertexPosition.z, 0.0f),
-      vertex.textureCoords = textureCoords[index];
-      vertex.normal = NORMALS[index / 6];
+        vertex.position = glm::vec4(position.x + vertexPosition.x, position.y + vertexPosition.y, position.z + vertexPosition.z, 0.0f),
+        vertex.textureCoords = textureCoords[index];
+        vertex.normal = NORMALS[index / 6];
 
-      visibleVertices.push_back(vertex);
+        visibleVertices.push_back(vertex);
+      }
     }
 
   return visibleVertices;

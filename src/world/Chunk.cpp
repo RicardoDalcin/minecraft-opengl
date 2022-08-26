@@ -5,9 +5,13 @@
 
 #include "world/BlockDatabase.hpp"
 
-Chunk::Chunk()
-    : m_VAO(NULL),
-      m_VBO(NULL)
+Chunk::Chunk(int chunkX, int chunkZ)
+    : m_ChunkX(chunkX),
+      m_ChunkZ(chunkZ),
+      m_VAO(NULL),
+      m_VBO(NULL),
+      m_TransparentVAO(NULL),
+      m_TransparentVBO(NULL)
 {
   for (int x = 0; x < CHUNK_SIZE; x++)
   {
@@ -15,7 +19,7 @@ Chunk::Chunk()
     {
       for (int z = 0; z < CHUNK_SIZE; z++)
       {
-        m_Cubes[x][y][z] = y == CHUNK_HEIGHT - 1 ? GRASS : DIRT;
+        m_Cubes[x][y][z] = y == CHUNK_HEIGHT - 1 ? WATER : DIRT;
       }
     }
   }
@@ -34,7 +38,15 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
   m_VAO = new VertexArray();
 
+  if (m_TransparentVAO != NULL)
+  {
+    delete m_TransparentVAO;
+  }
+
+  m_TransparentVAO = new VertexArray();
+
   std::vector<CubeVertex> vertices;
+  std::vector<CubeVertex> transparentVertices;
 
   for (int x = 0; x < CHUNK_SIZE; x++)
   {
@@ -55,48 +67,58 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
           if (z + 1 < CHUNK_SIZE)
           {
-            hasBlockInFront = m_Cubes[x][y][z + 1] != 0;
+            int blockInFront = m_Cubes[x][y][z + 1];
+            hasBlockInFront = blockInFront != AIR && blockInFront != WATER;
           }
           else if (neighbors[1] != NULL)
           {
-            hasBlockInFront = neighbors[1]->m_Cubes[x][y][0] != 0;
+            int blockInFront = neighbors[1]->m_Cubes[x][y][0];
+            hasBlockInFront = blockInFront != AIR && blockInFront != WATER;
           }
 
           if (x + 1 < CHUNK_SIZE)
           {
-            hasBlockInRight = m_Cubes[x + 1][y][z] != 0;
+            int blockInRight = m_Cubes[x + 1][y][z];
+            hasBlockInRight = blockInRight != AIR && blockInRight != WATER;
           }
           else if (neighbors[2] != NULL)
           {
-            hasBlockInRight = neighbors[2]->m_Cubes[0][y][z] != 0;
+            int blockInRight = neighbors[2]->m_Cubes[0][y][z];
+            hasBlockInRight = blockInRight != AIR && blockInRight != WATER;
           }
 
           if (z - 1 >= 0)
           {
-            hasBlockInBack = m_Cubes[x][y][z - 1] != 0;
+            int blockInBack = m_Cubes[x][y][z - 1];
+            hasBlockInBack = blockInBack != AIR && blockInBack != WATER;
           }
           else if (neighbors[3] != NULL)
           {
-            hasBlockInBack = neighbors[3]->m_Cubes[x][y][CHUNK_SIZE - 1] != 0;
+            int blockInBack = neighbors[3]->m_Cubes[x][y][CHUNK_SIZE - 1];
+            hasBlockInBack = blockInBack != AIR && blockInBack != WATER;
           }
 
           if (x - 1 >= 0)
           {
-            hasBlockInLeft = m_Cubes[x - 1][y][z] != 0;
+            int blockInLeft = m_Cubes[x - 1][y][z];
+            hasBlockInLeft = blockInLeft != AIR && blockInLeft != WATER;
           }
           else if (neighbors[0] != NULL)
           {
-            hasBlockInLeft = neighbors[0]->m_Cubes[CHUNK_SIZE - 1][y][z] != 0;
+            int blockInLeft = neighbors[0]->m_Cubes[CHUNK_SIZE - 1][y][z];
+            hasBlockInLeft = blockInLeft != AIR && blockInLeft != WATER;
           }
 
           if (y + 1 < CHUNK_HEIGHT)
           {
-            hasBlockInTop = m_Cubes[x][y + 1][z] != 0;
+            int blockInTop = m_Cubes[x][y + 1][z];
+            hasBlockInTop = blockInTop != AIR && blockInTop != WATER;
           }
 
           if (y - 1 >= 0)
           {
-            hasBlockInBottom = m_Cubes[x][y - 1][z] != 0;
+            int blockInBottom = m_Cubes[x][y - 1][z];
+            hasBlockInBottom = blockInBottom != AIR && blockInBottom != WATER;
           }
 
           std::array<bool, 6> occlusion = {
@@ -109,8 +131,12 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
           BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(cube);
 
-          std::vector<CubeVertex> visibleVertices = Cube::GetVisibleVertices(glm::vec3(x, y, z), blockInfo.textureCoordinates, occlusion);
-          vertices.insert(vertices.end(), visibleVertices.begin(), visibleVertices.end());
+          std::vector<CubeVertex> visibleVertices = Cube::GetVisibleVertices(cube, glm::vec3(x, y, z), blockInfo.textureCoordinates, occlusion);
+
+          if (blockInfo.isOpaque)
+            vertices.insert(vertices.end(), visibleVertices.begin(), visibleVertices.end());
+          else
+            transparentVertices.insert(transparentVertices.end(), visibleVertices.begin(), visibleVertices.end());
         }
       }
     }
@@ -119,7 +145,11 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
   if (m_VBO != NULL)
     delete m_VBO;
 
+  if (m_TransparentVBO != NULL)
+    delete m_TransparentVBO;
+
   m_VBO = new VertexBuffer(&vertices[0], vertices.size() * sizeof(CubeVertex));
+  m_TransparentVBO = new VertexBuffer(&transparentVertices[0], transparentVertices.size() * sizeof(CubeVertex));
 
   VertexBufferLayout *layout = new VertexBufferLayout();
 
@@ -128,8 +158,10 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
   layout->Push(LayoutType::LT_FLOAT, 4);
 
   m_VAO->AddBuffer(*m_VBO, *layout);
+  m_TransparentVAO->AddBuffer(*m_TransparentVBO, *layout);
 
   m_MeshVertexCount = vertices.size();
+  m_TransparentMeshVertexCount = transparentVertices.size();
 }
 
 void Chunk::Draw()
@@ -137,4 +169,13 @@ void Chunk::Draw()
   m_VAO->Bind();
 
   glDrawArrays(GL_TRIANGLES, 0, m_MeshVertexCount);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  m_TransparentVAO->Bind();
+
+  glDrawArrays(GL_TRIANGLES, 0, m_TransparentMeshVertexCount);
+
+  glDisable(GL_BLEND);
 }
