@@ -58,8 +58,8 @@ void main()
 
     vec4 defaultColor = vec4(0.6, 0.1, 0.04, 1.0);
     vec4 albedo = texture(uTexture, fTexCoords);
-    // float lightStrength = clamp(-dot(fNormal, sunlightDir), 0, 1);
-    float lightStrength = 1;
+    float lightStrength = clamp(-dot(fNormal, sunlightDir), 0, 1);
+    // float lightStrength = 1;
     lightStrength = max(ambientOcclusion, lightStrength);
 
     vec3 textureNormal = normalize(texture(uNormalTexture, fTexCoords).xyz * 2.0 - 1.0);
@@ -67,7 +67,7 @@ void main()
     float incidentAngle = -dot(textureNormal, sunlightDir);
     // float normalLightStrength = clamp(incidentAngle, 0.0, 1.0);
     float normalLightStrength = 1;
-    normalLightStrength = (normalLightStrength * 0.7) + 0.3;
+    normalLightStrength = (lightStrength * 0.7) + 0.3;
 
     if (incidentAngle < 0) {
         normalLightStrength -= ((incidentAngle * 0.7) + 0.3);
