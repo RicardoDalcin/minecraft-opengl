@@ -19,15 +19,13 @@ Chunk::Chunk()
       }
     }
   }
-
-  BuildMesh();
 }
 
 Chunk::~Chunk()
 {
 }
 
-void Chunk::BuildMesh()
+void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 {
   if (m_VAO != NULL)
   {
@@ -48,12 +46,58 @@ void Chunk::BuildMesh()
 
         if (cube != 0)
         {
-          bool hasBlockInFront = z + 1 < CHUNK_SIZE && m_Cubes[x][y][z + 1] != 0;
-          bool hasBlockInRight = x + 1 < CHUNK_SIZE && m_Cubes[x + 1][y][z] != 0;
-          bool hasBlockInBack = z - 1 >= 0 && m_Cubes[x][y][z - 1] != 0;
-          bool hasBlockInLeft = x - 1 >= 0 && m_Cubes[x - 1][y][z] != 0;
-          bool hasBlockInTop = y + 1 < CHUNK_HEIGHT && m_Cubes[x][y + 1][z] != 0;
-          bool hasBlockInBottom = y - 1 >= 0 && m_Cubes[x][y - 1][z] != 0;
+          bool hasBlockInFront = false;
+          bool hasBlockInRight = false;
+          bool hasBlockInBack = false;
+          bool hasBlockInLeft = false;
+          bool hasBlockInTop = false;
+          bool hasBlockInBottom = false;
+
+          if (z + 1 < CHUNK_SIZE)
+          {
+            hasBlockInFront = m_Cubes[x][y][z + 1] != 0;
+          }
+          else if (neighbors[1] != NULL)
+          {
+            hasBlockInFront = neighbors[1]->m_Cubes[x][y][0] != 0;
+          }
+
+          if (x + 1 < CHUNK_SIZE)
+          {
+            hasBlockInRight = m_Cubes[x + 1][y][z] != 0;
+          }
+          else if (neighbors[2] != NULL)
+          {
+            hasBlockInRight = neighbors[2]->m_Cubes[0][y][z] != 0;
+          }
+
+          if (z - 1 >= 0)
+          {
+            hasBlockInBack = m_Cubes[x][y][z - 1] != 0;
+          }
+          else if (neighbors[3] != NULL)
+          {
+            hasBlockInBack = neighbors[3]->m_Cubes[x][y][CHUNK_SIZE - 1] != 0;
+          }
+
+          if (x - 1 >= 0)
+          {
+            hasBlockInLeft = m_Cubes[x - 1][y][z] != 0;
+          }
+          else if (neighbors[0] != NULL)
+          {
+            hasBlockInLeft = neighbors[0]->m_Cubes[CHUNK_SIZE - 1][y][z] != 0;
+          }
+
+          if (y + 1 < CHUNK_HEIGHT)
+          {
+            hasBlockInTop = m_Cubes[x][y + 1][z] != 0;
+          }
+
+          if (y - 1 >= 0)
+          {
+            hasBlockInBottom = m_Cubes[x][y - 1][z] != 0;
+          }
 
           std::array<bool, 6> occlusion = {
               hasBlockInFront,

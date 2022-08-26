@@ -28,7 +28,7 @@ public:
   Chunk();
   ~Chunk();
 
-  void BuildMesh();
+  void BuildMesh(std::array<Chunk *, 4> neighbors);
 
   void Draw();
 };

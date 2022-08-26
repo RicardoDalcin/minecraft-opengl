@@ -74,6 +74,8 @@ int main()
 
     World world(&shader);
 
+    world.UpdateMeshes();
+
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
     printf("Elapsed time: %f \n", (float)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());

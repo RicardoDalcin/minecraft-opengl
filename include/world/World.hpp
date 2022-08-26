@@ -9,7 +9,7 @@
 class World
 {
 private:
-  static const int CHUNKS_PER_AXIS = 4;
+  static const int CHUNKS_PER_AXIS = 2;
 
   Shader *m_Shader;
   Texture *m_TextureAtlas;
@@ -20,6 +20,7 @@ public:
   World(Shader *shader);
   ~World();
 
+  void UpdateMeshes();
   void Draw(glm::mat4 view, glm::mat4 projection);
 };
 
