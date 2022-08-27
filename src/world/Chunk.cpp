@@ -156,6 +156,44 @@ Chunk::Chunk(int chunkX, int chunkZ)
         }
       }
     }
+
+    // for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
+    // {
+    //   for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
+    //   {
+    //     int height = heightMap[z * WorldConstants::CHUNK_SIZE + x];
+    //     if (height > WorldConstants::WATER_LEVEL + 3)
+    //     {
+    //       int willHaveTree = rand() % 100;
+    //       if (willHaveTree == 5)
+    //       {
+    //         int treeHeight = rand() % 3 + 4;
+    //         for (int y = 0; y < treeHeight; y++)
+    //         {
+    //           if (height + y + 1 < WorldConstants::CHUNK_HEIGHT)
+    //           {
+    //             m_Cubes[x][height + y + 1][z] = OAK_LOG;
+    //           }
+    //         }
+
+    //         for (int i = -2; i < 3; i++)
+    //         {
+    //           for (int j = -2; j < 3; j++)
+    //           {
+    //             if (i == 0 && j == 0)
+    //             {
+    //               continue;
+    //             }
+    //             if (x + i >= 0 && x + i < WorldConstants::CHUNK_SIZE && z + j >= 0 && z + j < WorldConstants::CHUNK_SIZE && height + treeHeight < WorldConstants::CHUNK_HEIGHT)
+    //             {
+    //               m_Cubes[x + i][height + treeHeight][z + j] = OAK_LEAVES;
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
 
