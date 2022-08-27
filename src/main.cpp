@@ -142,6 +142,16 @@ int main()
 
       camera.updatePosition(newCameraPosition);
 
+      if (Input::isKeyPressed(GLFW_KEY_V))
+      {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      }
+
+      if (Input::isKeyPressed(GLFW_KEY_B))
+      {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      }
+
       // defaultChunk.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
       world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
 

@@ -8,7 +8,7 @@ namespace WorldConstants
 
   const int WATER_LEVEL = CHUNK_SIZE;
 
-  const int CHUNKS_PER_AXIS = 32;
+  const int CHUNKS_PER_AXIS = 16;
 }
 
 #endif

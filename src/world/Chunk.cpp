@@ -118,7 +118,11 @@ Chunk::Chunk(int chunkX, int chunkZ)
             }
             else
             {
-              if (y <= height - heightToStone)
+              if (y == 0)
+              {
+                m_Cubes[x][y][z] = BEDROCK;
+              }
+              else if (y <= height - heightToStone)
               {
                 int willHaveOre = rand() % 20;
 
@@ -140,20 +144,13 @@ Chunk::Chunk(int chunkX, int chunkZ)
           }
           else
           {
-            if (y == 0)
+            if (y > height && y <= WorldConstants::WATER_LEVEL)
             {
-              m_Cubes[x][y][z] = BEDROCK;
+              m_Cubes[x][y][z] = WATER;
             }
             else
             {
-              if (y > height && y <= WorldConstants::WATER_LEVEL)
-              {
-                m_Cubes[x][y][z] = WATER;
-              }
-              else
-              {
-                m_Cubes[x][y][z] = AIR;
-              }
+              m_Cubes[x][y][z] = AIR;
             }
           }
         }
