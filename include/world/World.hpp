@@ -7,16 +7,15 @@
 #include "entity/Camera.hpp"
 
 #include "world/Chunk.hpp"
+#include "world/WorldConstants.hpp"
 
 class World
 {
 private:
-  static const int CHUNKS_PER_AXIS = 8;
-
   Shader *m_Shader;
   Texture *m_TextureAtlas;
 
-  std::array<std::array<Chunk *, CHUNKS_PER_AXIS>, CHUNKS_PER_AXIS> m_Chunks;
+  std::array<std::array<Chunk *, WorldConstants::CHUNKS_PER_AXIS>, WorldConstants::CHUNKS_PER_AXIS> m_Chunks;
 
 public:
   World(Shader *shader);

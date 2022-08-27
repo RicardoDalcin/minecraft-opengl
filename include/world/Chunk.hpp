@@ -9,13 +9,10 @@
 #include "engine/Texture.hpp"
 
 #include "world/Cube.hpp"
+#include "world/WorldConstants.hpp"
 
 class Chunk
 {
-public:
-  static const int CHUNK_SIZE = 16;
-  static const int CHUNK_HEIGHT = 64;
-
 private:
   int m_ChunkX;
   int m_ChunkZ;
@@ -30,7 +27,7 @@ private:
 
   int m_TransparentMeshVertexCount;
 
-  std::array<std::array<std::array<int, CHUNK_SIZE>, CHUNK_HEIGHT>, CHUNK_SIZE> m_Cubes;
+  std::array<std::array<std::array<int, WorldConstants::CHUNK_SIZE>, WorldConstants::CHUNK_HEIGHT>, WorldConstants::CHUNK_SIZE> m_Cubes;
 
 public:
   Chunk(int chunkX, int chunkZ);

@@ -68,7 +68,7 @@ std::vector<CubeVertex> Cube::GetVisibleVertices(int blockIndex, glm::vec3 posit
   std::vector<CubeVertex> visibleVertices;
 
   for (int index = 0; index < 36; index++)
-    if (blockIndex != WATER || (blockIndex == WATER && index / 6 == 4))
+    if (blockIndex != WATER || (blockIndex == WATER && index / 6 != 5))
     {
       if (!occludedFaces[floorf(index / 6)])
       {

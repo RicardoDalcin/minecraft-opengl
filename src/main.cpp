@@ -105,7 +105,7 @@ int main()
       Input::resetDeltas();
       // }
 
-      float baseSpeed = Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? 10.0f : 2.5f;
+      float baseSpeed = Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? 100.0f : 2.5f;
 
       float cameraSpeed = baseSpeed * Window::GetDeltaTime();
 

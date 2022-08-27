@@ -8,9 +8,9 @@ World::World(Shader *shader)
     : m_Shader(shader),
       m_TextureAtlas(new Texture("extras/textures/atlas.png", true))
 {
-  for (int x = 0; x < CHUNKS_PER_AXIS; x++)
+  for (int x = 0; x < WorldConstants::CHUNKS_PER_AXIS; x++)
   {
-    for (int z = 0; z < CHUNKS_PER_AXIS; z++)
+    for (int z = 0; z < WorldConstants::CHUNKS_PER_AXIS; z++)
     {
       m_Chunks[x][z] = new Chunk(x, z);
     }
@@ -19,9 +19,9 @@ World::World(Shader *shader)
 
 World::~World()
 {
-  for (int x = 0; x < CHUNKS_PER_AXIS; x++)
+  for (int x = 0; x < WorldConstants::CHUNKS_PER_AXIS; x++)
   {
-    for (int z = 0; z < CHUNKS_PER_AXIS; z++)
+    for (int z = 0; z < WorldConstants::CHUNKS_PER_AXIS; z++)
     {
       delete m_Chunks[x][z];
     }
@@ -30,15 +30,15 @@ World::~World()
 
 void World::UpdateMeshes()
 {
-  for (int x = 0; x < CHUNKS_PER_AXIS; x++)
+  for (int x = 0; x < WorldConstants::CHUNKS_PER_AXIS; x++)
   {
-    for (int z = 0; z < CHUNKS_PER_AXIS; z++)
+    for (int z = 0; z < WorldConstants::CHUNKS_PER_AXIS; z++)
     {
       std::array<Chunk *, 4> neighbors;
 
       neighbors[0] = x - 1 >= 0 ? m_Chunks[x - 1][z] : NULL;
-      neighbors[1] = z + 1 < CHUNKS_PER_AXIS ? m_Chunks[x][z + 1] : NULL;
-      neighbors[2] = x + 1 < CHUNKS_PER_AXIS ? m_Chunks[x + 1][z] : NULL;
+      neighbors[1] = z + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[x][z + 1] : NULL;
+      neighbors[2] = x + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[x + 1][z] : NULL;
       neighbors[3] = z - 1 >= 0 ? m_Chunks[x][z - 1] : NULL;
 
       m_Chunks[x][z]->BuildMesh(neighbors);
@@ -62,13 +62,13 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
 
   std::vector<std::pair<float, Chunk *>> chunks;
 
-  for (int x = 0; x < CHUNKS_PER_AXIS; x++)
+  for (int x = 0; x < WorldConstants::CHUNKS_PER_AXIS; x++)
   {
-    for (int z = 0; z < CHUNKS_PER_AXIS; z++)
+    for (int z = 0; z < WorldConstants::CHUNKS_PER_AXIS; z++)
     {
       Chunk *chunk = m_Chunks[x][z];
 
-      float distance = glm::distance(glm::vec2(cameraPosition.x, cameraPosition.z), glm::vec2(x * Chunk::CHUNK_SIZE, z * Chunk::CHUNK_SIZE));
+      float distance = glm::distance(glm::vec2(cameraPosition.x, cameraPosition.z), glm::vec2(x * WorldConstants::CHUNK_SIZE, z * WorldConstants::CHUNK_SIZE));
 
       chunks.push_back(std::make_pair(distance, chunk));
     }
@@ -82,7 +82,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
     int chunkX = chunk.second->GetChunkX();
     int chunkZ = chunk.second->GetChunkZ();
 
-    glm::mat4 model = Matrix_Translate(chunkX * Chunk::CHUNK_SIZE, 0.0f, chunkZ * Chunk::CHUNK_SIZE);
+    glm::mat4 model = Matrix_Translate(chunkX * WorldConstants::CHUNK_SIZE, 0.0f, chunkZ * WorldConstants::CHUNK_SIZE);
 
     m_Shader->SetUniformMat4f("uTransform", model);
 
