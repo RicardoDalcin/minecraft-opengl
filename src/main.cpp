@@ -33,10 +33,10 @@
 #include "engine/Renderer.hpp"
 
 #include "entity/Camera.hpp"
+#include "entity/Character.hpp"
 #include "entity/Input.hpp"
 #include "entity/Window.hpp"
 
-// #include "world/Chunk.hpp"
 #include "world/BlockDatabase.hpp"
 #include "world/World.hpp"
 
@@ -61,6 +61,8 @@ int main()
     Renderer renderer;
 
     Camera camera(-0.1f, -1024.0f, 3.141592 / 3.0f);
+    Character player(glm::vec4(0.0f, 64.0f, -3.0f, 1.0f));
+
     Shader shader("src/Cube.shader");
 
     glEnable(GL_DEPTH_TEST);
@@ -84,31 +86,6 @@ int main()
 
       renderer.Clear();
 
-      // if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-      // {
-      glm::vec2 deltaPos = Input::getDeltaMousePosition();
-
-      float newTheta = camera.getCameraTheta() - 0.003f * deltaPos.x;
-      float newPhi = camera.getCameraPhi() - 0.003f * deltaPos.y;
-
-      // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
-      float phimax = 3.141592f / 2;
-      float phimin = -phimax;
-
-      if (newPhi > phimax)
-        newPhi = phimax;
-
-      if (newPhi < phimin)
-        newPhi = phimin;
-
-      camera.updateCameraAngles(newTheta, newPhi);
-      Input::resetDeltas();
-      // }
-
-      float baseSpeed = Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? 100.0f : 2.5f;
-
-      float cameraSpeed = baseSpeed * Window::GetDeltaTime();
-
       if (Input::isKeyPressed(GLFW_KEY_O))
       {
         camera.useOrthographic();
@@ -118,29 +95,6 @@ int main()
       {
         camera.usePerspective();
       }
-
-      glm::vec4 newCameraPosition = camera.getPosition();
-      if (Input::isKeyPressed(GLFW_KEY_W))
-      {
-        newCameraPosition += camera.getTarget() * cameraSpeed;
-      }
-
-      if (Input::isKeyPressed(GLFW_KEY_S))
-      {
-        newCameraPosition -= camera.getTarget() * cameraSpeed;
-      }
-
-      if (Input::isKeyPressed(GLFW_KEY_A))
-      {
-        newCameraPosition -= camera.getRight() * cameraSpeed;
-      }
-
-      if (Input::isKeyPressed(GLFW_KEY_D))
-      {
-        newCameraPosition += camera.getRight() * cameraSpeed;
-      }
-
-      camera.updatePosition(newCameraPosition);
 
       if (Input::isKeyPressed(GLFW_KEY_V))
       {
@@ -152,7 +106,8 @@ int main()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
-      // defaultChunk.Draw(camera.computeViewMatrix(), camera.computeProjectionMatrix());
+      player.Update(&camera);
+
       world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
 
       Window::EndFrame();
