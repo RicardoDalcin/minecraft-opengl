@@ -4,49 +4,9 @@
 
 #include "world/Chunk.hpp"
 
+#include "world/Noise.hpp"
+#include "world/TerrainGeneration.hpp"
 #include "world/BlockDatabase.hpp"
-
-struct NoiseOptions
-{
-  int octaves;
-  float amplitude;
-  float smoothness;
-  float roughness;
-  float offset;
-};
-
-float getNoiseAt(const glm::vec2 &voxelPosition, const glm::vec2 &chunkPosition, NoiseOptions &options, int seed)
-{
-  // Get voxel X/Z positions
-  float voxelX = voxelPosition.x + chunkPosition.x * WorldConstants::CHUNK_SIZE;
-  float voxelZ = voxelPosition.y + chunkPosition.y * WorldConstants::CHUNK_SIZE;
-
-  // Begin iterating through the octaves
-  float value = 0;
-  float accumulatedAmps = 0;
-  for (int i = 0; i < options.octaves; i++)
-  {
-    float frequency = glm::pow(2.0f, i);
-    float amplitude = glm::pow(options.roughness, i);
-
-    float x = voxelX * frequency / options.smoothness;
-    float y = voxelZ * frequency / options.smoothness;
-
-    float noise = glm::simplex(glm::vec3{seed + x, seed + y, seed});
-    noise = (noise + 1.0f) / 2.0f;
-    value += noise * amplitude;
-    accumulatedAmps += amplitude;
-  }
-  return value / accumulatedAmps;
-}
-
-float rounded(const glm::vec2 &coord)
-{
-  auto bump = [](float t)
-  { return glm::max(0.0f, 1.0f - std::pow(t, 6.0f)); };
-  float b = bump(coord.x) * bump(coord.y);
-  return b * 0.9f;
-}
 
 Chunk::Chunk(int chunkX, int chunkZ)
     : m_ChunkX(chunkX),
@@ -56,144 +16,26 @@ Chunk::Chunk(int chunkX, int chunkZ)
       m_TransparentVAO(NULL),
       m_TransparentVBO(NULL)
 {
-  int cx = chunkX;
-  int cz = chunkZ;
-
   std::array<int, WorldConstants::CHUNK_SIZE * WorldConstants::CHUNK_SIZE> heightMap;
-
-  const float WORLD_SIZE = static_cast<float>(WorldConstants::CHUNKS_PER_AXIS) * WorldConstants::CHUNK_SIZE;
-
-  NoiseOptions firstNoise;
-  firstNoise.amplitude = 105;
-  firstNoise.octaves = 6;
-  firstNoise.smoothness = 205.f;
-  firstNoise.roughness = 0.58f;
-  firstNoise.offset = 18;
-
-  NoiseOptions secondNoise;
-  secondNoise.amplitude = 20;
-  secondNoise.octaves = 4;
-  secondNoise.smoothness = 200;
-  secondNoise.roughness = 0.45f;
-  secondNoise.offset = 0;
 
   for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
   {
     for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
     {
-      float bx = static_cast<float>(x + cx * WorldConstants::CHUNK_SIZE);
-      float bz = static_cast<float>(z + cz * WorldConstants::CHUNK_SIZE);
-
-      glm::vec2 coord = (glm::vec2(bx, bz) - WORLD_SIZE / 2.0f) / WORLD_SIZE * 2.0f;
-
-      auto noise = getNoiseAt({x, z}, glm::vec2(cx, cz), firstNoise, 8500);
-      auto noise2 = getNoiseAt({x, z}, {cx, cz}, secondNoise, 8500);
-
-      auto island = rounded(coord) * 1.25;
-      float result = noise * noise2;
-
-      heightMap[x + z * WorldConstants::CHUNK_SIZE] = glm::max(static_cast<int>((result * firstNoise.amplitude + firstNoise.offset) *
-                                                                                island) -
-                                                                   5,
-                                                               2);
+      heightMap[x + z * WorldConstants::CHUNK_SIZE] = TerrainGeneration::GetHeight(glm::vec2(x, z), glm::vec2(chunkX, chunkZ));
     }
+  }
 
-    int ores[6] = {IRON_ORE, COAL_ORE, DIAMOND_ORE, REDSTONE_ORE, GOLD_ORE, LAPIS_ORE};
-
-    for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
+  for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
+  {
+    for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
     {
-      for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
+      for (int y = 0; y < WorldConstants::CHUNK_HEIGHT; y++)
       {
-        int height = heightMap[z * WorldConstants::CHUNK_SIZE + x];
-
-        int heightToStone = rand() % 3 + 2;
-
-        for (int y = 0; y < WorldConstants::CHUNK_HEIGHT; y++)
-        {
-          if (y <= height)
-          {
-            if (y == height)
-            {
-              m_Cubes[x][y][z] = height > WorldConstants::WATER_LEVEL + 3 ? GRASS : SAND;
-            }
-            else
-            {
-              if (y == 0)
-              {
-                m_Cubes[x][y][z] = BEDROCK;
-              }
-              else if (y <= height - heightToStone)
-              {
-                int willHaveOre = rand() % 20;
-
-                if (willHaveOre == 5)
-                {
-                  int oreIndex = rand() % 5;
-                  m_Cubes[x][y][z] = ores[oreIndex];
-                }
-                else
-                {
-                  m_Cubes[x][y][z] = STONE;
-                }
-              }
-              else
-              {
-                m_Cubes[x][y][z] = DIRT;
-              }
-            }
-          }
-          else
-          {
-            if (y > height && y <= WorldConstants::WATER_LEVEL)
-            {
-              m_Cubes[x][y][z] = WATER;
-            }
-            else
-            {
-              m_Cubes[x][y][z] = AIR;
-            }
-          }
-        }
+        int block = TerrainGeneration::GetBlockAtHeight(y, heightMap[x + z * WorldConstants::CHUNK_SIZE]);
+        m_Cubes[x][y][z] = block;
       }
     }
-
-    // for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
-    // {
-    //   for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
-    //   {
-    //     int height = heightMap[z * WorldConstants::CHUNK_SIZE + x];
-    //     if (height > WorldConstants::WATER_LEVEL + 3)
-    //     {
-    //       int willHaveTree = rand() % 100;
-    //       if (willHaveTree == 5)
-    //       {
-    //         int treeHeight = rand() % 3 + 4;
-    //         for (int y = 0; y < treeHeight; y++)
-    //         {
-    //           if (height + y + 1 < WorldConstants::CHUNK_HEIGHT)
-    //           {
-    //             m_Cubes[x][height + y + 1][z] = OAK_LOG;
-    //           }
-    //         }
-
-    //         for (int i = -2; i < 3; i++)
-    //         {
-    //           for (int j = -2; j < 3; j++)
-    //           {
-    //             if (i == 0 && j == 0)
-    //             {
-    //               continue;
-    //             }
-    //             if (x + i >= 0 && x + i < WorldConstants::CHUNK_SIZE && z + j >= 0 && z + j < WorldConstants::CHUNK_SIZE && height + treeHeight < WorldConstants::CHUNK_HEIGHT)
-    //             {
-    //               m_Cubes[x + i][height + treeHeight][z + j] = OAK_LEAVES;
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
   }
 }
 
