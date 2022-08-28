@@ -1,5 +1,7 @@
 #include "entity/Character.hpp"
 
+#include <cstdio>
+
 Character::Character()
     : m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
 {
@@ -19,7 +21,7 @@ void Character::SetPosition(glm::vec4 position)
   m_Position = position;
 }
 
-void Character::Update(Camera *camera)
+void Character::Update(Camera *camera, World *world)
 {
   glm::vec2 deltaPos = Input::getDeltaMousePosition();
 
@@ -66,4 +68,37 @@ void Character::Update(Camera *camera)
   }
 
   camera->updatePosition(newCameraPosition);
+
+  Ray ray(10.0f);
+
+  glm::vec3 pos;
+  glm::vec3 dir;
+
+  m_BreakBlockTimer += Window::GetDeltaTime();
+
+  if (m_BreakBlockTimer > BREAK_COOLDOWN)
+  {
+    m_CanBreakBlock = true;
+  }
+
+  if (ray.RayCast(camera->getPosition(), camera->getTarget(), world, World::RayCastCallback, &pos, &dir))
+  {
+    printf("Raycast hit at (%f, %f, %f)\n", pos.x, pos.y, pos.z);
+
+    if (m_CanBreakBlock)
+    {
+      if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
+      {
+        world->SetBlock(pos, AIR);
+        m_BreakBlockTimer = 0.0f;
+        m_CanBreakBlock = false;
+      }
+      else if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+      {
+        world->SetBlock(pos + dir, COBBLESTONE);
+        m_BreakBlockTimer = 0.0f;
+        m_CanBreakBlock = false;
+      }
+    }
+  }
 }

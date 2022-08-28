@@ -5,6 +5,7 @@
 
 #include "engine/VertexArray.hpp"
 #include "engine/VertexBuffer.hpp"
+#include "engine/VertexBufferLayout.hpp"
 #include "engine/Shader.hpp"
 #include "engine/Texture.hpp"
 
@@ -35,6 +36,9 @@ public:
 
   int GetChunkX() const { return m_ChunkX; }
   int GetChunkZ() const { return m_ChunkZ; }
+
+  int GetCube(glm::vec3 position) const { return m_Cubes[position.x][position.y][position.z]; }
+  void SetCube(glm::vec3 position, int block) { m_Cubes[position.x][position.y][position.z] = block; }
 
   void BuildMesh(std::array<Chunk *, 4> neighbors);
 

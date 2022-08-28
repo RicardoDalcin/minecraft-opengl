@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <glad/glad.h>
+#include "core.h"
 
 #include "Renderer.hpp"
 

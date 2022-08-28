@@ -2,7 +2,8 @@
 #define _INPUT_H
 
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
+
+#include "core.h"
 
 class Input
 {

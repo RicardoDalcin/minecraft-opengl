@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include "core.h"
 
 #include <stb_image/stb_image.h>
 

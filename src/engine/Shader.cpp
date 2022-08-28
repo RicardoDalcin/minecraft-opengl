@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-#include <glad/glad.h>
+#include "core.h"
 
 #include "engine/Shader.hpp"
 #include "engine/Renderer.hpp"

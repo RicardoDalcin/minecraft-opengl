@@ -89,3 +89,104 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
     chunk.second->Draw();
   }
 }
+
+bool World::RayCastCallback(World *data, glm::vec3 position)
+{
+  int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;
+  int chunkZ = (int)position.z / WorldConstants::CHUNK_SIZE;
+
+  int blockX = (int)position.x % WorldConstants::CHUNK_SIZE;
+  int blockZ = (int)position.z % WorldConstants::CHUNK_SIZE;
+
+  if (blockX < 0)
+  {
+    blockX += WorldConstants::CHUNK_SIZE;
+    chunkX--;
+  }
+
+  if (blockZ < 0)
+  {
+    blockZ += WorldConstants::CHUNK_SIZE;
+    chunkZ--;
+  }
+
+  if (chunkX < 0 || chunkX >= WorldConstants::CHUNKS_PER_AXIS || chunkZ < 0 || chunkZ >= WorldConstants::CHUNKS_PER_AXIS)
+  {
+    return false;
+  }
+
+  Chunk *chunk = data->m_Chunks[chunkX][chunkZ];
+
+  int blockY = (int)position.y;
+
+  if (blockY < 0 || blockY >= WorldConstants::CHUNK_HEIGHT)
+  {
+    return false;
+  }
+
+  int block = chunk->GetCube(glm::vec3(blockX, blockY, blockZ));
+
+  return block != AIR && block != WATER;
+}
+
+void World::SetBlock(glm::vec3 position, int block)
+{
+  int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;
+  int chunkZ = (int)position.z / WorldConstants::CHUNK_SIZE;
+
+  int blockX = (int)position.x % WorldConstants::CHUNK_SIZE;
+  int blockZ = (int)position.z % WorldConstants::CHUNK_SIZE;
+
+  if (chunkX < 0 || chunkX >= WorldConstants::CHUNKS_PER_AXIS || chunkZ < 0 || chunkZ >= WorldConstants::CHUNKS_PER_AXIS)
+  {
+    return;
+  }
+
+  Chunk *chunk = m_Chunks[chunkX][chunkZ];
+
+  int blockY = (int)position.y;
+
+  if (blockY < 0 || blockY >= WorldConstants::CHUNK_HEIGHT)
+  {
+    return;
+  }
+
+  chunk->SetCube(glm::vec3(blockX, blockY, blockZ), block);
+
+  std::array<Chunk *, 4> neighbors;
+
+  neighbors[0] = chunkX - 1 >= 0 ? m_Chunks[chunkX - 1][chunkZ] : NULL;
+  neighbors[1] = chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX][chunkZ + 1] : NULL;
+  neighbors[2] = chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 1][chunkZ] : NULL;
+  neighbors[3] = chunkZ - 1 >= 0 ? m_Chunks[chunkX][chunkZ - 1] : NULL;
+
+  chunk->BuildMesh(neighbors);
+
+  if (blockX == 0 && chunkX - 1 >= 0)
+  {
+    Chunk *neighbor = m_Chunks[chunkX - 1][chunkZ];
+
+    neighbor->BuildMesh(neighbors);
+  }
+
+  if (blockX == WorldConstants::CHUNK_SIZE - 1 && chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS)
+  {
+    Chunk *neighbor = m_Chunks[chunkX + 1][chunkZ];
+
+    neighbor->BuildMesh(neighbors);
+  }
+
+  if (blockZ == 0 && chunkZ - 1 >= 0)
+  {
+    Chunk *neighbor = m_Chunks[chunkX][chunkZ - 1];
+
+    neighbor->BuildMesh(neighbors);
+  }
+
+  if (blockZ == WorldConstants::CHUNK_SIZE - 1 && chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS)
+  {
+    Chunk *neighbor = m_Chunks[chunkX][chunkZ + 1];
+
+    neighbor->BuildMesh(neighbors);
+  }
+}

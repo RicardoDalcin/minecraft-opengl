@@ -10,7 +10,7 @@ int TerrainGeneration::GetHeight(glm::vec2 blockPosition, glm::vec2 chunkPositio
   auto noise = baseNoise.GetNoise(blockPosition, chunkPosition);
   auto noise2 = accentNoise.GetNoise(blockPosition, chunkPosition);
 
-  auto island = GetIslandHeight(blockPosition, chunkPosition) * 1.25;
+  auto island = GetIslandHeight(blockPosition, chunkPosition, 2.0f) * 1.25;
 
   float result = noise * noise2;
 

@@ -1,11 +1,16 @@
 #ifndef _CHARACTER_H
 #define _CHARACTER_H
 
-#include "glm/glm.hpp"
+#include <functional>
+#include <glm/glm.hpp>
 
 #include "entity/Camera.hpp"
 #include "entity/Input.hpp"
 #include "entity/Window.hpp"
+
+#include "world/World.hpp"
+
+#include "physics/Ray.hpp"
 
 class Character
 {
@@ -14,6 +19,11 @@ private:
   const float m_RunSpeed = 100.0f;
 
   glm::vec4 m_Position;
+
+  const float BREAK_COOLDOWN = 0.2f;
+
+  bool m_CanBreakBlock = true;
+  float m_BreakBlockTimer = 0.0f;
 
 public:
   Character();
@@ -24,7 +34,7 @@ public:
 
   glm::vec4 GetPosition() const { return m_Position; }
 
-  void Update(Camera *camera);
+  void Update(Camera *camera, World *world);
 };
 
 #endif

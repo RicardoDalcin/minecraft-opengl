@@ -12,6 +12,7 @@
         "-g",
         "${workspaceFolder}/src/core/*.cpp",
         "${workspaceFolder}/src/engine/*.cpp",
+        "${workspaceFolder}/src/physics/*.cpp",
         "${workspaceFolder}/src/entity/*.cpp",
         "${workspaceFolder}/src/world/*.cpp",
         "${workspaceFolder}/src/*.cpp",

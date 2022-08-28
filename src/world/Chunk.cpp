@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
-#include <glad/glad.h>
+#include "core.h"
 
 #include "world/Chunk.hpp"
 

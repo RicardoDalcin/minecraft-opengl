@@ -1,7 +1,6 @@
 #include <cstdio>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "core.h"
 
 GLenum glCheckError_(const char *file, int line)
 {

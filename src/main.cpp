@@ -10,8 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "core.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
@@ -33,12 +32,13 @@
 #include "engine/Renderer.hpp"
 
 #include "entity/Camera.hpp"
-#include "entity/Character.hpp"
 #include "entity/Input.hpp"
 #include "entity/Window.hpp"
 
 #include "world/BlockDatabase.hpp"
 #include "world/World.hpp"
+
+#include "entity/Character.hpp"
 
 int main()
 {
@@ -106,7 +106,7 @@ int main()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
-      player.Update(&camera);
+      player.Update(&camera, &world);
 
       world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
 

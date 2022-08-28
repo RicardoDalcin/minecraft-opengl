@@ -1,7 +1,7 @@
 #ifndef _WINDOW_H
 #define _WINDOW_H
 
-#include <GLFW/glfw3.h>
+#include "core.h"
 
 class Window
 {

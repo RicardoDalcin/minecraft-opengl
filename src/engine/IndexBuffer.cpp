@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include "core.h"
 
 #include "engine/IndexBuffer.hpp"
 
