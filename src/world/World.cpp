@@ -153,18 +153,27 @@ void World::SetBlock(glm::vec3 position, int block)
 
   chunk->SetCube(glm::vec3(blockX, blockY, blockZ), block);
 
-  std::array<Chunk *, 4> neighbors;
+  std::array<Chunk *, 4> baseChunkNeighbors;
 
-  neighbors[0] = chunkX - 1 >= 0 ? m_Chunks[chunkX - 1][chunkZ] : NULL;
-  neighbors[1] = chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX][chunkZ + 1] : NULL;
-  neighbors[2] = chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 1][chunkZ] : NULL;
-  neighbors[3] = chunkZ - 1 >= 0 ? m_Chunks[chunkX][chunkZ - 1] : NULL;
+  baseChunkNeighbors[0] = chunkX - 1 >= 0 ? m_Chunks[chunkX - 1][chunkZ] : NULL;
+  baseChunkNeighbors[1] = chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX][chunkZ + 1] : NULL;
+  baseChunkNeighbors[2] = chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 1][chunkZ] : NULL;
+  baseChunkNeighbors[3] = chunkZ - 1 >= 0 ? m_Chunks[chunkX][chunkZ - 1] : NULL;
 
-  chunk->BuildMesh(neighbors);
+  chunk->BuildMesh(baseChunkNeighbors);
+
+  printf("Break block at (%d, %d, %d) in chunk (%d, %d)\n", blockX, blockY, blockZ, chunkX, chunkZ);
 
   if (blockX == 0 && chunkX - 1 >= 0)
   {
     Chunk *neighbor = m_Chunks[chunkX - 1][chunkZ];
+
+    std::array<Chunk *, 4> neighbors;
+
+    neighbors[0] = chunkX - 2 >= 0 ? m_Chunks[chunkX - 2][chunkZ] : NULL;
+    neighbors[1] = chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX - 1][chunkZ + 1] : NULL;
+    neighbors[2] = chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX][chunkZ] : NULL;
+    neighbors[3] = chunkZ - 1 >= 0 ? m_Chunks[chunkX - 1][chunkZ - 1] : NULL;
 
     neighbor->BuildMesh(neighbors);
   }
@@ -173,6 +182,13 @@ void World::SetBlock(glm::vec3 position, int block)
   {
     Chunk *neighbor = m_Chunks[chunkX + 1][chunkZ];
 
+    std::array<Chunk *, 4> neighbors;
+
+    neighbors[0] = chunkX - 1 >= 0 ? m_Chunks[chunkX][chunkZ] : NULL;
+    neighbors[1] = chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 1][chunkZ + 1] : NULL;
+    neighbors[2] = chunkX + 2 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 2][chunkZ] : NULL;
+    neighbors[3] = chunkZ - 1 >= 0 ? m_Chunks[chunkX + 1][chunkZ - 1] : NULL;
+
     neighbor->BuildMesh(neighbors);
   }
 
@@ -180,12 +196,26 @@ void World::SetBlock(glm::vec3 position, int block)
   {
     Chunk *neighbor = m_Chunks[chunkX][chunkZ - 1];
 
+    std::array<Chunk *, 4> neighbors;
+
+    neighbors[0] = chunkX - 1 >= 0 ? m_Chunks[chunkX - 1][chunkZ - 1] : NULL;
+    neighbors[1] = chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX][chunkZ] : NULL;
+    neighbors[2] = chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 1][chunkZ - 1] : NULL;
+    neighbors[3] = chunkZ - 2 >= 0 ? m_Chunks[chunkX][chunkZ - 2] : NULL;
+
     neighbor->BuildMesh(neighbors);
   }
 
   if (blockZ == WorldConstants::CHUNK_SIZE - 1 && chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS)
   {
     Chunk *neighbor = m_Chunks[chunkX][chunkZ + 1];
+
+    std::array<Chunk *, 4> neighbors;
+
+    neighbors[0] = chunkX - 1 >= 0 ? m_Chunks[chunkX - 1][chunkZ + 1] : NULL;
+    neighbors[1] = chunkZ + 2 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX][chunkZ + 2] : NULL;
+    neighbors[2] = chunkX + 1 < WorldConstants::CHUNKS_PER_AXIS ? m_Chunks[chunkX + 1][chunkZ + 1] : NULL;
+    neighbors[3] = chunkZ - 1 >= 0 ? m_Chunks[chunkX][chunkZ] : NULL;
 
     neighbor->BuildMesh(neighbors);
   }
