@@ -69,7 +69,7 @@ void Character::Update(Camera *camera, World *world)
 
   camera->updatePosition(newCameraPosition);
 
-  Ray ray(10.0f);
+  Ray ray(5.5f);
 
   glm::vec3 pos;
   glm::vec3 dir;
