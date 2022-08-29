@@ -22,8 +22,11 @@ private:
 
   const float BREAK_COOLDOWN = 0.2f;
 
-  bool m_CanBreakBlock = true;
-  float m_BreakBlockTimer = 0.0f;
+  bool m_ShouldBreakBlock = false;
+  bool m_ShouldPlaceBlock = false;
+  bool m_ShouldPickBlock = false;
+
+  int m_BlockToPlace = 1;
 
 public:
   Character();
@@ -35,6 +38,9 @@ public:
   glm::vec4 GetPosition() const { return m_Position; }
 
   void Update(Camera *camera, World *world);
+
+  void OnClick(int button, int action, int mods);
+  void OnScroll(double xoffset, double yoffset);
 };
 
 #endif

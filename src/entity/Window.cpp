@@ -50,6 +50,7 @@ bool Window::Init()
   glfwSetKeyCallback(window, Input::keyCallback);
   glfwSetMouseButtonCallback(window, Input::mouseButtonCallback);
   glfwSetCursorPosCallback(window, Input::cursorPositionCallback);
+  glfwSetScrollCallback(window, Input::scrollCallback);
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

@@ -74,31 +74,58 @@ void Character::Update(Camera *camera, World *world)
   glm::vec3 pos;
   glm::vec3 dir;
 
-  m_BreakBlockTimer += Window::GetDeltaTime();
-
-  if (m_BreakBlockTimer > BREAK_COOLDOWN)
-  {
-    m_CanBreakBlock = true;
-  }
-
   if (ray.RayCast(camera->getPosition(), camera->getTarget(), world, World::RayCastCallback, &pos, &dir))
   {
-    printf("Raycast hit at (%f, %f, %f)\n", pos.x, pos.y, pos.z);
-
-    if (m_CanBreakBlock)
+    if (m_ShouldPickBlock)
     {
-      if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-      {
-        world->SetBlock(pos, AIR);
-        m_BreakBlockTimer = 0.0f;
-        m_CanBreakBlock = false;
-      }
-      else if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
-      {
-        world->SetBlock(pos + dir, COBBLESTONE);
-        m_BreakBlockTimer = 0.0f;
-        m_CanBreakBlock = false;
-      }
+      m_BlockToPlace = world->GetBlock(glm::vec3(pos.x, pos.y, pos.z));
     }
+
+    if (m_ShouldBreakBlock)
+    {
+      world->SetBlock(pos, AIR);
+    }
+    else if (m_ShouldPlaceBlock && m_BlockToPlace != AIR && m_BlockToPlace != WATER)
+    {
+      world->SetBlock(pos + dir, m_BlockToPlace);
+    }
+  }
+
+  m_ShouldBreakBlock = false;
+  m_ShouldPlaceBlock = false;
+  m_ShouldPickBlock = false;
+}
+
+void Character::OnClick(int button, int action, int mods)
+{
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+  {
+    m_ShouldBreakBlock = true;
+    m_ShouldPlaceBlock = false;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+  {
+    m_ShouldPlaceBlock = true;
+    m_ShouldBreakBlock = false;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
+  {
+    m_ShouldPickBlock = true;
+  }
+}
+
+void Character::OnScroll(double xoffset, double yoffset)
+{
+  m_BlockToPlace += (int)yoffset;
+
+  if (m_BlockToPlace < 1)
+  {
+    m_BlockToPlace = 52;
+  }
+  else if (m_BlockToPlace > 52)
+  {
+    m_BlockToPlace = 1;
   }
 }

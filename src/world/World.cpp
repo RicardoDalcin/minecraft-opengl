@@ -173,3 +173,40 @@ void World::SetBlock(glm::vec3 position, int block)
 
   UpdateMeshes();
 }
+
+int World::GetBlock(glm::vec3 position)
+{
+  int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;
+  int chunkZ = (int)position.z / WorldConstants::CHUNK_SIZE;
+
+  int blockX = (int)position.x % WorldConstants::CHUNK_SIZE;
+  int blockZ = (int)position.z % WorldConstants::CHUNK_SIZE;
+
+  if (blockX < 0)
+  {
+    blockX += WorldConstants::CHUNK_SIZE;
+    chunkX--;
+  }
+
+  if (blockZ < 0)
+  {
+    blockZ += WorldConstants::CHUNK_SIZE;
+    chunkZ--;
+  }
+
+  if (chunkX < 0 || chunkX >= WorldConstants::CHUNKS_PER_AXIS || chunkZ < 0 || chunkZ >= WorldConstants::CHUNKS_PER_AXIS)
+  {
+    return AIR;
+  }
+
+  Chunk *chunk = m_Chunks[chunkX][chunkZ];
+
+  int blockY = (int)position.y;
+
+  if (blockY < 0 || blockY >= WorldConstants::CHUNK_HEIGHT)
+  {
+    return AIR;
+  }
+
+  return chunk->GetCube(glm::vec3(blockX, blockY, blockZ));
+}

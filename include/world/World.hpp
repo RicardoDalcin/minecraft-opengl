@@ -46,6 +46,7 @@ public:
   void Draw(Camera *camera, glm::mat4 view, glm::mat4 projection);
 
   void SetBlock(glm::vec3 position, int block);
+  int GetBlock(glm::vec3 position);
 };
 
 #endif
