@@ -87,7 +87,10 @@ void Character::Update(Camera *camera, World *world)
     }
     else if (m_ShouldPlaceBlock && m_BlockToPlace != AIR && m_BlockToPlace != WATER)
     {
-      world->SetBlock(pos + dir, m_BlockToPlace);
+      if (world->GetBlock(pos + dir) == AIR)
+      {
+        world->SetBlock(pos + dir, m_BlockToPlace);
+      }
     }
   }
 
