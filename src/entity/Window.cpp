@@ -8,6 +8,9 @@ float Window::screenRatio = 0.0f;
 float Window::deltaTime = 0.0f;
 float Window::lastFrame = 0.0f;
 
+int Window::width = 0.0f;
+int Window::height = 0.0f;
+
 GLFWwindow *Window::window = nullptr;
 
 bool Window::Init()
@@ -31,16 +34,19 @@ bool Window::Init()
 
   const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-  int width = mode->width;
-  int height = mode->height;
+  int windowWidth = mode->width;
+  int windowHeight = mode->height;
 
-  // int width = 1280;
-  // int height = 720;
+  // int windowWidth = 1280;
+  // int windowHeight = 720;
 
-  screenRatio = (float)width / height;
+  height = windowHeight;
+  width = windowWidth;
 
-  window = glfwCreateWindow(width, height, "Minecraft", glfwGetPrimaryMonitor(), NULL);
-  // window = glfwCreateWindow(width, height, "Minecraft", NULL, NULL);
+  screenRatio = (float)windowWidth / windowHeight;
+
+  window = glfwCreateWindow(windowWidth, windowHeight, "Minecraft", glfwGetPrimaryMonitor(), NULL);
+  // window = glfwCreateWindow(windowWidth, windowHeight, "Minecraft", NULL, NULL);
   if (!window)
   {
     glfwTerminate();
@@ -112,4 +118,14 @@ bool Window::GetShouldClose()
 GLFWwindow *Window::GetWindow()
 {
   return window;
+}
+
+int Window::GetWidth()
+{
+  return width;
+}
+
+int Window::GetHeight()
+{
+  return height;
 }

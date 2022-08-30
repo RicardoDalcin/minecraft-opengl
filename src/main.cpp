@@ -34,6 +34,7 @@
 #include "entity/Camera.hpp"
 #include "entity/Input.hpp"
 #include "entity/Window.hpp"
+#include "entity/UserInterface.hpp"
 
 #include "world/BlockDatabase.hpp"
 #include "world/World.hpp"
@@ -112,6 +113,8 @@ int main()
       player.Update(&camera, &world);
 
       world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
+
+      UserInterface::DrawUI(player.GetHotbarPosition());
 
       Window::EndFrame();
     }

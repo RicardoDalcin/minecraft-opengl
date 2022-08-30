@@ -12,6 +12,9 @@ private:
   static float deltaTime;
   static float lastFrame;
 
+  static int width;
+  static int height;
+
   static GLFWwindow *window;
 
 public:
@@ -30,6 +33,9 @@ public:
   static bool GetShouldClose();
 
   static GLFWwindow *GetWindow();
+
+  static int GetWidth();
+  static int GetHeight();
 };
 
 #endif

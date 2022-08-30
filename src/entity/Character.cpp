@@ -131,4 +131,7 @@ void Character::OnScroll(double xoffset, double yoffset)
   {
     m_BlockToPlace = 1;
   }
+
+  int newHotbarPosition = m_HotbarPosition - (int)yoffset;
+  m_HotbarPosition = newHotbarPosition < 0 ? HOTBAR_SIZE - 1 : newHotbarPosition % HOTBAR_SIZE;
 }

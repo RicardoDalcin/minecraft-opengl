@@ -12,6 +12,8 @@
 
 #include "physics/Ray.hpp"
 
+const int HOTBAR_SIZE = 9;
+
 class Character
 {
 private:
@@ -28,6 +30,8 @@ private:
 
   int m_BlockToPlace = 1;
 
+  int m_HotbarPosition = 0;
+
 public:
   Character();
   Character(glm::vec4 position);
@@ -36,6 +40,7 @@ public:
   void SetPosition(glm::vec4 position);
 
   glm::vec4 GetPosition() const { return m_Position; }
+  int GetHotbarPosition() const { return m_HotbarPosition; }
 
   void Update(Camera *camera, World *world);
 
