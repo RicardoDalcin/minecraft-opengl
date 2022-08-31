@@ -11,7 +11,9 @@
 #include "engine/IndexBuffer.hpp"
 #include "engine/Renderer.hpp"
 
-#include "entity/Character.hpp"
+#include "entity/Window.hpp"
+
+const int UI_HOTBAR_SIZE = 9;
 
 class UserInterface
 {
@@ -35,10 +37,20 @@ private:
   static const float hotbarSelectorWidth;
   static const float hotbarSelectorHeight;
 
-public:
-  static void DrawUIElement(std::string texturePath, int elementWidth, int elementHeight, float centerX, float centerY);
+  static const float hotbarIconWidth;
+  static const float hotbarIconHeight;
 
-  static void DrawUI(int hotbarPosition);
+  static std::array<float, 5 * 4 * UI_HOTBAR_SIZE> hotbarVertices;
+  static std::array<unsigned int, 6 * UI_HOTBAR_SIZE> hotbarIndices;
+
+public:
+  static void UpdateHotbarPosition(int position, std::array<glm::vec2, 4> textureCoords);
+
+  static void DrawUIElement(Shader *shader, std::string texturePath, int elementWidth, int elementHeight, float centerX, float centerY);
+
+  static void DrawHotbarIcons(Shader *shader);
+
+  static void DrawUI(Shader *shader, Texture *atlas, int hotbarPosition);
 };
 
 #endif

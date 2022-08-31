@@ -59,21 +59,22 @@ int main()
   printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
   {
+    BlockDatabase::Initialize();
+
     Renderer renderer;
 
     Camera camera(-0.1f, -1024.0f, 3.141592 / 3.0f);
     Character player(glm::vec4(0.0f, 64.0f, -3.0f, 1.0f));
 
-    Shader shader("src/Cube.shader");
+    Shader worldShader("extras/shaders/World.shader");
+    Shader interfaceShader("extras/shaders/Interface.shader");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    BlockDatabase::Initialize();
-
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-    World world(&shader);
+    World world(&worldShader);
 
     world.UpdateMeshes();
 
@@ -89,6 +90,10 @@ int main()
       Window::Tick();
 
       renderer.Clear();
+
+      float fps = Window::GetFPS();
+
+      printf("FPS: %f \n", fps);
 
       if (Input::isKeyPressed(GLFW_KEY_O))
       {
@@ -114,7 +119,7 @@ int main()
 
       world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
 
-      UserInterface::DrawUI(player.GetHotbarPosition());
+      UserInterface::DrawUI(&interfaceShader, world.GetTextureAtlas(), player.GetHotbarPosition());
 
       Window::EndFrame();
     }

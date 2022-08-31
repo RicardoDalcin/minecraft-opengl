@@ -10,6 +10,10 @@ Character::Character()
 Character::Character(glm::vec4 position)
     : m_Position(position)
 {
+  for (int i = 0; i < HOTBAR_SIZE; i++)
+  {
+    SetHotbarItem(i, i + 1);
+  }
 }
 
 Character::~Character()
@@ -19,6 +23,21 @@ Character::~Character()
 void Character::SetPosition(glm::vec4 position)
 {
   m_Position = position;
+}
+
+void Character::SetHotbarItem(int position, int id)
+{
+  m_Hotbar[position] = id;
+
+  BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(id);
+
+  std::array<glm::vec2, 4> faceCoords = {
+      blockInfo.textureCoordinates[0],
+      blockInfo.textureCoordinates[1],
+      blockInfo.textureCoordinates[2],
+      blockInfo.textureCoordinates[3]};
+
+  UserInterface::UpdateHotbarPosition(position, faceCoords);
 }
 
 void Character::Update(Camera *camera, World *world)
@@ -78,18 +97,20 @@ void Character::Update(Camera *camera, World *world)
   {
     if (m_ShouldPickBlock)
     {
-      m_BlockToPlace = world->GetBlock(glm::vec3(pos.x, pos.y, pos.z));
+      SetHotbarItem(m_HotbarPosition, world->GetBlock(glm::vec3(pos.x, pos.y, pos.z)));
     }
+
+    int block = m_Hotbar[m_HotbarPosition];
 
     if (m_ShouldBreakBlock)
     {
       world->SetBlock(pos, AIR);
     }
-    else if (m_ShouldPlaceBlock && m_BlockToPlace != AIR && m_BlockToPlace != WATER)
+    else if (m_ShouldPlaceBlock && block != AIR && block != WATER)
     {
       if (world->GetBlock(pos + dir) == AIR)
       {
-        world->SetBlock(pos + dir, m_BlockToPlace);
+        world->SetBlock(pos + dir, block);
       }
     }
   }
@@ -121,16 +142,16 @@ void Character::OnClick(int button, int action, int mods)
 
 void Character::OnScroll(double xoffset, double yoffset)
 {
-  m_BlockToPlace += (int)yoffset;
+  // m_BlockToPlace += (int)yoffset;
 
-  if (m_BlockToPlace < 1)
-  {
-    m_BlockToPlace = 52;
-  }
-  else if (m_BlockToPlace > 52)
-  {
-    m_BlockToPlace = 1;
-  }
+  // if (m_BlockToPlace < 1)
+  // {
+  //   m_BlockToPlace = 52;
+  // }
+  // else if (m_BlockToPlace > 52)
+  // {
+  //   m_BlockToPlace = 1;
+  // }
 
   int newHotbarPosition = m_HotbarPosition - (int)yoffset;
   m_HotbarPosition = newHotbarPosition < 0 ? HOTBAR_SIZE - 1 : newHotbarPosition % HOTBAR_SIZE;

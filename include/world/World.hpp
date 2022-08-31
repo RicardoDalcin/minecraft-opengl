@@ -47,6 +47,8 @@ public:
 
   void SetBlock(glm::vec3 position, int block);
   int GetBlock(glm::vec3 position);
+
+  Texture *GetTextureAtlas() { return m_TextureAtlas; }
 };
 
 #endif

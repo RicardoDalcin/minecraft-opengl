@@ -7,6 +7,7 @@
 #include "entity/Camera.hpp"
 #include "entity/Input.hpp"
 #include "entity/Window.hpp"
+#include "entity/UserInterface.hpp"
 
 #include "world/World.hpp"
 
@@ -28,8 +29,7 @@ private:
   bool m_ShouldPlaceBlock = false;
   bool m_ShouldPickBlock = false;
 
-  int m_BlockToPlace = 1;
-
+  std::array<int, HOTBAR_SIZE> m_Hotbar = {};
   int m_HotbarPosition = 0;
 
 public:
@@ -40,7 +40,11 @@ public:
   void SetPosition(glm::vec4 position);
 
   glm::vec4 GetPosition() const { return m_Position; }
+
+  void SetHotbarItem(int position, int id);
+
   int GetHotbarPosition() const { return m_HotbarPosition; }
+  std::array<int, HOTBAR_SIZE> GetHotbar() const { return m_Hotbar; }
 
   void Update(Camera *camera, World *world);
 

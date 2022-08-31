@@ -36,6 +36,8 @@ public:
 
   static int GetWidth();
   static int GetHeight();
+
+  static float GetFPS();
 };
 
 #endif

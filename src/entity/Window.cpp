@@ -129,3 +129,8 @@ int Window::GetHeight()
 {
   return height;
 }
+
+float Window::GetFPS()
+{
+  return 1.0f / deltaTime;
+}
