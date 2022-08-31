@@ -1,7 +1,7 @@
 #include "entity/UserInterface.hpp"
 
-const float UserInterface::crosshairWidth = 32.0f;
-const float UserInterface::crosshairHeight = 32.0f;
+const float UserInterface::crosshairWidth = 20.0f;
+const float UserInterface::crosshairHeight = 20.0f;
 
 const float UserInterface::crosshairCenterX = 0.0f;
 const float UserInterface::crosshairCenterY = 0.0f;

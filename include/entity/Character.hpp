@@ -18,7 +18,7 @@ const int HOTBAR_SIZE = 9;
 class Character
 {
 private:
-  const float m_BaseSpeed = 2.5f;
+  const float m_BaseSpeed = 5.0f;
   const float m_RunSpeed = 100.0f;
 
   glm::vec4 m_Position;

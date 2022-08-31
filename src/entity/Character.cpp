@@ -60,7 +60,7 @@ void Character::Update(Camera *camera, World *world)
   camera->updateCameraAngles(newTheta, newPhi);
   Input::resetDeltas();
 
-  float baseSpeed = Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT) ? m_RunSpeed : m_BaseSpeed;
+  float baseSpeed = Input::isKeyPressed(GLFW_KEY_LEFT_CONTROL) ? m_RunSpeed : m_BaseSpeed;
 
   float speed = baseSpeed * Window::GetDeltaTime();
 
@@ -142,17 +142,24 @@ void Character::OnClick(int button, int action, int mods)
 
 void Character::OnScroll(double xoffset, double yoffset)
 {
-  // m_BlockToPlace += (int)yoffset;
+  if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+  {
+    int newBlock = m_Hotbar[m_HotbarPosition] - (int)yoffset;
 
-  // if (m_BlockToPlace < 1)
-  // {
-  //   m_BlockToPlace = 52;
-  // }
-  // else if (m_BlockToPlace > 52)
-  // {
-  //   m_BlockToPlace = 1;
-  // }
+    if (newBlock < 1)
+    {
+      newBlock = 52;
+    }
+    else if (newBlock > 52)
+    {
+      newBlock = 1;
+    }
 
-  int newHotbarPosition = m_HotbarPosition - (int)yoffset;
-  m_HotbarPosition = newHotbarPosition < 0 ? HOTBAR_SIZE - 1 : newHotbarPosition % HOTBAR_SIZE;
+    SetHotbarItem(m_HotbarPosition, newBlock);
+  }
+  else
+  {
+    int newHotbarPosition = m_HotbarPosition - (int)yoffset;
+    m_HotbarPosition = newHotbarPosition < 0 ? HOTBAR_SIZE - 1 : newHotbarPosition % HOTBAR_SIZE;
+  }
 }
