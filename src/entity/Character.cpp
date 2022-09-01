@@ -31,11 +31,13 @@ void Character::SetHotbarItem(int position, int id)
 
   BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(id);
 
+  int offset = blockInfo.blockId.find("_leaves") != std::string::npos ? 24 : 0;
+
   std::array<glm::vec2, 4> faceCoords = {
-      blockInfo.textureCoordinates[0],
-      blockInfo.textureCoordinates[1],
-      blockInfo.textureCoordinates[2],
-      blockInfo.textureCoordinates[3]};
+      blockInfo.textureCoordinates[offset + 0],
+      blockInfo.textureCoordinates[offset + 1],
+      blockInfo.textureCoordinates[offset + 2],
+      blockInfo.textureCoordinates[offset + 3]};
 
   UserInterface::UpdateHotbarPosition(position, faceCoords);
 }

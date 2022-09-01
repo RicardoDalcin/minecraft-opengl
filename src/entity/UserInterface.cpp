@@ -6,9 +6,9 @@ const float UserInterface::crosshairHeight = 20.0f;
 const float UserInterface::crosshairCenterX = 0.0f;
 const float UserInterface::crosshairCenterY = 0.0f;
 
-const float UserInterface::hotbarSlotSize = 64.0f;
+const float UserInterface::hotbarSlotSize = 32.0f * 2.0f;
 
-const float UserInterface::hotbarWidth = hotbarSlotSize * UI_HOTBAR_SIZE;
+const float UserInterface::hotbarWidth = hotbarSlotSize * UI_HOTBAR_SIZE + 4.0f * 2.0f;
 const float UserInterface::hotbarHeight = hotbarSlotSize;
 
 const float UserInterface::hotbarCenterX = 0.0f;
