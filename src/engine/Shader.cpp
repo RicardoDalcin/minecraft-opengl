@@ -10,7 +10,8 @@
 #include "engine/Renderer.hpp"
 
 Shader::Shader(const std::string &filepath)
-    : m_FilePath(filepath), m_RendererId(0)
+    : m_RendererId(0),
+      m_FilePath(filepath)
 {
   ShaderProgramSource source = ParseShader(filepath);
   m_RendererId = CreateShader(source.VertexSource, source.FragmentSource);

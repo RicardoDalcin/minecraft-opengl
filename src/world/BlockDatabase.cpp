@@ -119,6 +119,8 @@ BlockInformation BlockDatabase::GetBlockInformation(std::string blockId)
       return block;
     }
   }
+
+  return blockInformation[0];
 }
 
 BlockInformation BlockDatabase::GetBlockInformationIndex(int index)
