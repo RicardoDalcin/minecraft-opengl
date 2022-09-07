@@ -49,6 +49,7 @@ public:
   void Update(Camera *camera, World *world);
 
   void OnClick(int button, int action, int mods);
+  void OnKeypress(int key, int scancode, int action, int mods);
   void OnScroll(double xoffset, double yoffset);
 };
 

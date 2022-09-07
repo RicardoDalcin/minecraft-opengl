@@ -142,6 +142,14 @@ void Character::OnClick(int button, int action, int mods)
   }
 }
 
+void Character::OnKeypress(int key, int scancode, int action, int mods)
+{
+  if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS)
+  {
+    m_HotbarPosition = key - GLFW_KEY_1;
+  }
+}
+
 void Character::OnScroll(double xoffset, double yoffset)
 {
   if (Input::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))

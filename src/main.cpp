@@ -74,6 +74,7 @@ int main()
     printf("Elapsed time: %f \n", (float)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     Input::RegisterMouseButtonCallback(std::bind(&Character::OnClick, &player, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    Input::RegisterKeyCallback(std::bind(&Character::OnKeypress, &player, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
     Input::RegisterScrollCallback(std::bind(&Character::OnScroll, &player, std::placeholders::_1, std::placeholders::_2));
 
     while (!Window::GetShouldClose())
