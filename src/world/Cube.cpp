@@ -3,7 +3,6 @@
 #include "world/Cube.hpp"
 
 static const std::array<uint32_t, 36> ELEMENTS = {
-    // Each set of 6 indices represents one quad
     1, 0, 2, 3, 1, 2, // Front face
     5, 1, 3, 7, 5, 3, // Right face
     7, 6, 4, 5, 7, 4, // Back face

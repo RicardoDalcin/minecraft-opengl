@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-#include "core/matrices.hpp"
+#include "core/Matrices.hpp"
 
 #include "world/World.hpp"
 

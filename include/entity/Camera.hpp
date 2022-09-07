@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include "core/matrices.hpp"
+#include "core/Matrices.hpp"
 
 class Camera
 {
@@ -32,9 +32,9 @@ private:
 
     m_CameraFront = glm::normalize(glm::vec4(x, y, z, 0.0f));
 
-    glm::vec4 w = -m_CameraFront / norm(m_CameraFront);
+    glm::vec4 w = -m_CameraFront / Matrices::norm(m_CameraFront);
 
-    m_CameraRight = crossproduct(m_CameraUp, w) / norm(crossproduct(m_CameraUp, w));
+    m_CameraRight = Matrices::crossproduct(m_CameraUp, w) / Matrices::norm(Matrices::crossproduct(m_CameraUp, w));
   };
 
 public:

@@ -1,4 +1,4 @@
-#include "core/matrices.hpp"
+#include "core/Matrices.hpp"
 
 #include "entity/Camera.hpp"
 
@@ -62,14 +62,14 @@ glm::vec4 Camera::getRight() const
 
 glm::mat4 Camera::computeViewMatrix() const
 {
-  return Matrix_Camera_View(m_CameraCenter, m_CameraFront, m_CameraUp);
+  return Matrices::matrixCameraView(m_CameraCenter, m_CameraFront, m_CameraUp);
 }
 
 glm::mat4 Camera::computeProjectionMatrix() const
 {
   if (m_UsePerspective)
   {
-    return Matrix_Perspective(m_FOV, g_Ratio, m_Nearplane, m_Farplane);
+    return Matrices::matrixPerspective(m_FOV, g_Ratio, m_Nearplane, m_Farplane);
   }
 
   float t = 1.5f * m_CameraDistance / 2.5f;
@@ -77,5 +77,5 @@ glm::mat4 Camera::computeProjectionMatrix() const
   float r = t * g_Ratio;
   float l = -r;
 
-  return Matrix_Orthographic(l, r, b, t, m_Nearplane, m_Farplane);
+  return Matrices::matrixOrthographic(l, r, b, t, m_Nearplane, m_Farplane);
 }

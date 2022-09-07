@@ -2,7 +2,7 @@
 
 #include "world/World.hpp"
 
-#include "core/matrices.hpp"
+#include "core/Matrices.hpp"
 
 World::World(Shader *shader)
     : m_Shader(shader),
@@ -85,7 +85,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
     int chunkX = chunk.second->GetChunkX();
     int chunkZ = chunk.second->GetChunkZ();
 
-    glm::mat4 model = Matrix_Translate(chunkX * WorldConstants::CHUNK_SIZE, 0.0f, chunkZ * WorldConstants::CHUNK_SIZE);
+    glm::mat4 model = Matrices::matrixTranslate(chunkX * WorldConstants::CHUNK_SIZE, 0.0f, chunkZ * WorldConstants::CHUNK_SIZE);
 
     m_Shader->SetUniformMat4f("uTransform", model);
 

@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "core/matrices.hpp"
-
 #include "world/BlockDatabase.hpp"
 
 struct CubeVertex
