@@ -150,9 +150,9 @@ void Character::OnScroll(double xoffset, double yoffset)
 
     if (newBlock < 1)
     {
-      newBlock = 52;
+      newBlock = BLOCK_COUNT - 1;
     }
-    else if (newBlock > 52)
+    else if (newBlock > BLOCK_COUNT - 1)
     {
       newBlock = 1;
     }

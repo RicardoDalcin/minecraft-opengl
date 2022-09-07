@@ -106,6 +106,8 @@ const int FURNACE_FACE = 165;
 const int WATER_SIDE = 96;
 const int WATER_TOP = 97;
 
+const int GLASS_SIDE = 154;
+
 struct TextureInfo
 {
   int face;
@@ -181,6 +183,8 @@ const TextureInfo FURNACE_TEXTURE = {FURNACE_FACE, FURNACE_SIDE, FURNACE_TOP, FU
 
 const TextureInfo WATER_TEXTURE = {WATER_SIDE, WATER_SIDE, WATER_TOP, WATER_SIDE};
 
+const TextureInfo GLASS_TEXTURE = {GLASS_SIDE, GLASS_SIDE, GLASS_SIDE, GLASS_SIDE};
+
 struct BlockBaseInformation
 {
   std::string blockId;
@@ -198,7 +202,7 @@ struct BlockInformation
   bool isSolid;
 };
 
-const int BLOCK_COUNT = 54;
+const int BLOCK_COUNT = 55;
 
 const BlockBaseInformation BLOCK_ATLAS[BLOCK_COUNT] = {
     {"air", AIR_TEXTURE, false, false},
@@ -255,6 +259,7 @@ const BlockBaseInformation BLOCK_ATLAS[BLOCK_COUNT] = {
     {"crafting_table", CRAFTING_TABLE_TEXTURE, true, true},
     {"furnace", FURNACE_TEXTURE, true, true},
     {"water", WATER_TEXTURE, false, false},
+    {"glass", GLASS_TEXTURE, false, true},
 };
 
 const int AIR = 0;

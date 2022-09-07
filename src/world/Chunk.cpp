@@ -82,57 +82,87 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
           if (z + 1 < WorldConstants::CHUNK_SIZE)
           {
             int blockInFront = m_Cubes[x][y][z + 1];
-            hasBlockInFront = cube != WATER ? blockInFront != AIR && blockInFront != WATER : blockInFront != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInFront);
+
+            hasBlockInFront = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInFront == WATER;
           }
           else if (neighbors[1] != NULL)
           {
             int blockInFront = neighbors[1]->m_Cubes[x][y][0];
-            hasBlockInFront = cube != WATER ? blockInFront != AIR && blockInFront != WATER : blockInFront != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInFront);
+
+            hasBlockInFront = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInFront == WATER;
           }
 
           if (x + 1 < WorldConstants::CHUNK_SIZE)
           {
             int blockInRight = m_Cubes[x + 1][y][z];
-            hasBlockInRight = cube != WATER ? blockInRight != AIR && blockInRight != WATER : blockInRight != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInRight);
+
+            hasBlockInRight = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInRight == WATER;
           }
           else if (neighbors[2] != NULL)
           {
             int blockInRight = neighbors[2]->m_Cubes[0][y][z];
-            hasBlockInRight = cube != WATER ? blockInRight != AIR && blockInRight != WATER : blockInRight != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInRight);
+
+            hasBlockInRight = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInRight == WATER;
           }
 
           if (z - 1 >= 0)
           {
             int blockInBack = m_Cubes[x][y][z - 1];
-            hasBlockInBack = cube != WATER ? blockInBack != AIR && blockInBack != WATER : blockInBack != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInBack);
+
+            hasBlockInBack = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBack == WATER;
           }
           else if (neighbors[3] != NULL)
           {
             int blockInBack = neighbors[3]->m_Cubes[x][y][WorldConstants::CHUNK_SIZE - 1];
-            hasBlockInBack = cube != WATER ? blockInBack != AIR && blockInBack != WATER : blockInBack != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInBack);
+
+            hasBlockInBack = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBack == WATER;
           }
 
           if (x - 1 >= 0)
           {
             int blockInLeft = m_Cubes[x - 1][y][z];
-            hasBlockInLeft = cube != WATER ? blockInLeft != AIR && blockInLeft != WATER : blockInLeft != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInLeft);
+
+            hasBlockInLeft = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInLeft == WATER;
           }
           else if (neighbors[0] != NULL)
           {
             int blockInLeft = neighbors[0]->m_Cubes[WorldConstants::CHUNK_SIZE - 1][y][z];
-            hasBlockInLeft = cube != WATER ? blockInLeft != AIR && blockInLeft != WATER : blockInLeft != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInLeft);
+
+            hasBlockInLeft = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInLeft == WATER;
           }
 
           if (y + 1 < WorldConstants::CHUNK_HEIGHT)
           {
             int blockInTop = m_Cubes[x][y + 1][z];
-            hasBlockInTop = cube != WATER ? blockInTop != AIR && blockInTop != WATER : blockInTop != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInTop);
+
+            hasBlockInTop = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInTop == WATER;
           }
 
           if (y - 1 >= 0)
           {
             int blockInBottom = m_Cubes[x][y - 1][z];
-            hasBlockInBottom = cube != WATER ? blockInBottom != AIR && blockInBottom != WATER : blockInBottom != AIR;
+
+            BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInBottom);
+
+            hasBlockInBottom = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBottom == WATER;
           }
 
           std::array<bool, 6> occlusion = {
