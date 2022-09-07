@@ -71,7 +71,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
     {
       Chunk *chunk = m_Chunks[x][z];
 
-      float distance = glm::distance(glm::vec2(cameraPosition.x, cameraPosition.z), glm::vec2(x * WorldConstants::CHUNK_SIZE, z * WorldConstants::CHUNK_SIZE));
+      float distance = glm::distance(glm::vec2(cameraPosition.x, cameraPosition.z), glm::vec2(x * WorldConstants::CHUNK_SIZE + WorldConstants::CHUNK_SIZE / 2, z * WorldConstants::CHUNK_SIZE + WorldConstants::CHUNK_SIZE / 2));
 
       chunks.push_back(std::make_pair(distance, chunk));
     }
