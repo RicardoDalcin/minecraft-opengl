@@ -120,6 +120,3 @@ int main()
 
   return 0;
 }
-
-// set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
-// vim: set spell spelllang=pt_br :

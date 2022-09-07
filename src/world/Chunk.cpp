@@ -72,6 +72,8 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
         if (cube != 0)
         {
+          BlockInformation cubeInfo = BlockDatabase::GetBlockInformationIndex(cube);
+
           bool hasBlockInFront = false;
           bool hasBlockInRight = false;
           bool hasBlockInBack = false;
@@ -85,7 +87,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInFront);
 
-            hasBlockInFront = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInFront == WATER;
+            hasBlockInFront = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInFront == cube;
           }
           else if (neighbors[1] != NULL)
           {
@@ -93,7 +95,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInFront);
 
-            hasBlockInFront = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInFront == WATER;
+            hasBlockInFront = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInFront == cube;
           }
 
           if (x + 1 < WorldConstants::CHUNK_SIZE)
@@ -102,7 +104,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInRight);
 
-            hasBlockInRight = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInRight == WATER;
+            hasBlockInRight = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInRight == cube;
           }
           else if (neighbors[2] != NULL)
           {
@@ -110,7 +112,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInRight);
 
-            hasBlockInRight = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInRight == WATER;
+            hasBlockInRight = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInRight == cube;
           }
 
           if (z - 1 >= 0)
@@ -119,7 +121,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInBack);
 
-            hasBlockInBack = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBack == WATER;
+            hasBlockInBack = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBack == cube;
           }
           else if (neighbors[3] != NULL)
           {
@@ -127,7 +129,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInBack);
 
-            hasBlockInBack = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBack == WATER;
+            hasBlockInBack = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBack == cube;
           }
 
           if (x - 1 >= 0)
@@ -136,7 +138,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInLeft);
 
-            hasBlockInLeft = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInLeft == WATER;
+            hasBlockInLeft = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInLeft == cube;
           }
           else if (neighbors[0] != NULL)
           {
@@ -144,7 +146,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInLeft);
 
-            hasBlockInLeft = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInLeft == WATER;
+            hasBlockInLeft = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInLeft == cube;
           }
 
           if (y + 1 < WorldConstants::CHUNK_HEIGHT)
@@ -153,7 +155,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInTop);
 
-            hasBlockInTop = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInTop == WATER;
+            hasBlockInTop = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInTop == cube;
           }
 
           if (y - 1 >= 0)
@@ -162,7 +164,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
             BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(blockInBottom);
 
-            hasBlockInBottom = cube != WATER ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBottom == WATER;
+            hasBlockInBottom = cubeInfo.isOpaque ? blockInfo.isOpaque : blockInfo.isOpaque || blockInBottom == cube;
           }
 
           std::array<bool, 6> occlusion = {
