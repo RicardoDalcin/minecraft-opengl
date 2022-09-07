@@ -43,6 +43,7 @@ in vec2 fTexCoords;
 in vec3 fNormal;
 in mat3 fTBN;
 
+uniform int uIsOpaque;
 uniform sampler2D uTexture;
 
 // NOTE: These are not required for the challenges
@@ -72,6 +73,10 @@ void main()
     if (incidentAngle < 0) {
         normalLightStrength -= ((incidentAngle * 0.7) + 0.3);
         normalLightStrength = clamp(normalLightStrength, 0, 1);
+    }
+
+    if (uIsOpaque == 0) {
+        normalLightStrength = 1;
     }
 
     vec4 finalColor = albedo * normalLightStrength;

@@ -210,14 +210,18 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
   m_TransparentMeshVertexCount = transparentVertices.size();
 }
 
-void Chunk::Draw()
+void Chunk::Draw(Shader *shader)
 {
+  shader->SetUniform1i("uIsOpaque", 1);
+
   m_VAO->Bind();
 
   glDrawArrays(GL_TRIANGLES, 0, m_MeshVertexCount);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  shader->SetUniform1i("uIsOpaque", 0);
 
   m_TransparentVAO->Bind();
 

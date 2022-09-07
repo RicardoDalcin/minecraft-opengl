@@ -89,7 +89,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
 
     m_Shader->SetUniformMat4f("uTransform", model);
 
-    chunk.second->Draw();
+    chunk.second->Draw(m_Shader);
   }
 }
 

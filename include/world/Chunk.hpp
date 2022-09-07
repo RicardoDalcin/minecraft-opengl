@@ -42,7 +42,7 @@ public:
 
   void BuildMesh(std::array<Chunk *, 4> neighbors);
 
-  void Draw();
+  void Draw(Shader *shader);
 };
 
 #endif
