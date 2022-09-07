@@ -61,7 +61,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
   m_TextureAtlas->Bind(0);
   m_Shader->SetUniform1i("uTexture", 0);
 
-  glm::vec4 cameraPosition = camera->getPosition();
+  glm::vec4 cameraPosition = camera->GetPosition();
 
   std::vector<std::pair<float, Chunk *>> chunks;
 
@@ -85,7 +85,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
     int chunkX = chunk.second->GetChunkX();
     int chunkZ = chunk.second->GetChunkZ();
 
-    glm::mat4 model = Matrices::matrixTranslate(chunkX * WorldConstants::CHUNK_SIZE, 0.0f, chunkZ * WorldConstants::CHUNK_SIZE);
+    glm::mat4 model = Matrices::MatrixTranslate(chunkX * WorldConstants::CHUNK_SIZE, 0.0f, chunkZ * WorldConstants::CHUNK_SIZE);
 
     m_Shader->SetUniformMat4f("uTransform", model);
 

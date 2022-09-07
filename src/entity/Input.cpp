@@ -24,7 +24,7 @@ std::vector<KeyCallbackType> Input::keyCallbacks = {};
 std::vector<MouseButtonCallbackType> Input::mouseButtonCallbacks = {};
 std::vector<ScrollCallbackType> Input::scrollCallbacks = {};
 
-void Input::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
@@ -36,7 +36,7 @@ void Input::keyCallback(GLFWwindow *window, int key, int scancode, int action, i
     callback(key, scancode, action, mods);
 }
 
-void Input::mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+void Input::MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
   if (button >= 0 && button < GLFW_MOUSE_BUTTON_LAST)
     Input::pressedMouseButtons[button] = action != GLFW_RELEASE;
@@ -45,18 +45,18 @@ void Input::mouseButtonCallback(GLFWwindow *window, int button, int action, int 
     callback(button, action, mods);
 }
 
-void Input::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
+void Input::ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
   for (auto &callback : scrollCallbacks)
     callback(xoffset, yoffset);
 }
 
-void Input::resetDeltas()
+void Input::ResetDeltas()
 {
   Input::deltaMousePosition = glm::vec2(0.0f, 0.0f);
 }
 
-void Input::cursorPositionCallback(GLFWwindow *window, double xpos, double ypos)
+void Input::CursorPositionCallback(GLFWwindow *window, double xpos, double ypos)
 {
   mousePosition.x = (float)xpos;
   mousePosition.y = (float)ypos;
@@ -72,7 +72,7 @@ void Input::cursorPositionCallback(GLFWwindow *window, double xpos, double ypos)
   lastMousePosition = mousePosition;
 }
 
-bool Input::isKeyPressed(int key)
+bool Input::IsKeyPressed(int key)
 {
   if (key >= 0 && key < GLFW_KEY_LAST)
     return Input::pressedKeys[key];
@@ -80,7 +80,7 @@ bool Input::isKeyPressed(int key)
   return false;
 }
 
-bool Input::isMouseButtonPressed(int button)
+bool Input::IsMouseButtonPressed(int button)
 {
   if (button >= 0 && button < GLFW_MOUSE_BUTTON_LAST)
     return Input::pressedMouseButtons[button];
@@ -88,27 +88,27 @@ bool Input::isMouseButtonPressed(int button)
   return false;
 }
 
-glm::vec2 Input::getMousePosition()
+glm::vec2 Input::GetMousePosition()
 {
   return mousePosition;
 }
 
-glm::vec2 Input::getDeltaMousePosition()
+glm::vec2 Input::GetDeltaMousePosition()
 {
   return deltaMousePosition;
 }
 
-void Input::registerKeyCallback(KeyCallbackType callback)
+void Input::RegisterKeyCallback(KeyCallbackType callback)
 {
   keyCallbacks.push_back(callback);
 }
 
-void Input::registerMouseButtonCallback(MouseButtonCallbackType callback)
+void Input::RegisterMouseButtonCallback(MouseButtonCallbackType callback)
 {
   mouseButtonCallbacks.push_back(callback);
 }
 
-void Input::registerScrollCallback(ScrollCallbackType callback)
+void Input::RegisterScrollCallback(ScrollCallbackType callback)
 {
   scrollCallbacks.push_back(callback);
 }

@@ -21,7 +21,7 @@ namespace Matrices
   //
   // Para conseguirmos definir matrizes através de suas LINHAS, a função matrix()
   // computa a transposta usando os elementos passados por parâmetros.
-  glm::mat4 matrix(
+  glm::mat4 Matrix(
       float m00, float m01, float m02, float m03, // LINHA 1
       float m10, float m11, float m12, float m13, // LINHA 2
       float m20, float m21, float m22, float m23, // LINHA 3
@@ -37,9 +37,9 @@ namespace Matrices
   }
 
   // Matriz identidade.
-  glm::mat4 matrixIdentity()
+  glm::mat4 MatrixIdentity()
   {
-    return matrix(
+    return Matrix(
         1.0f, 0.0f, 0.0f, 0.0f, // LINHA 1
         0.0f, 1.0f, 0.0f, 0.0f, // LINHA 2
         0.0f, 0.0f, 1.0f, 0.0f, // LINHA 3
@@ -53,9 +53,9 @@ namespace Matrices
   //
   //     T*p = p+t.
   //
-  glm::mat4 matrixTranslate(float tx, float ty, float tz)
+  glm::mat4 MatrixTranslate(float tx, float ty, float tz)
   {
-    return matrix(
+    return Matrix(
         1.0f, 0.0f, 0.0f, tx,  // LINHA 1
         0.0f, 1.0f, 0.0f, ty,  // LINHA 2
         0.0f, 0.0f, 1.0f, tz,  // LINHA 3
@@ -69,9 +69,9 @@ namespace Matrices
   //
   //     S*p = [sx*px, sy*py, sz*pz, pw].
   //
-  glm::mat4 matrixScale(float sx, float sy, float sz)
+  glm::mat4 MatrixScale(float sx, float sy, float sz)
   {
-    return matrix(
+    return Matrix(
         sx, 0.0f, 0.0f, 0.0f,  // LINHA 1
         0.0f, sy, 0.0f, 0.0f,  // LINHA 2
         0.0f, 0.0f, sz, 0.0f,  // LINHA 3
@@ -87,12 +87,12 @@ namespace Matrices
   //   R*p = [ px, c*py-s*pz, s*py+c*pz, pw ];
   //
   // onde 'c' e 's' são o cosseno e o seno do ângulo de rotação, respectivamente.
-  glm::mat4 matrixRotateX(float angle)
+  glm::mat4 MatrixRotateX(float angle)
   {
     float c = cos(angle);
     float s = sin(angle);
 
-    return matrix(
+    return Matrix(
         1.0f, 0.0f, 0.0f, 0.0f, // LINHA 1
         0.0f, c, -s, 0.0f,      // LINHA 2
         0.0f, s, c, 0.0f,       // LINHA 3
@@ -108,12 +108,12 @@ namespace Matrices
   //   R*p = [ c*px+s*pz, py, -s*px+c*pz, pw ];
   //
   // onde 'c' e 's' são o cosseno e o seno do ângulo de rotação, respectivamente.
-  glm::mat4 matrixRotateY(float angle)
+  glm::mat4 MatrixRotateY(float angle)
   {
     float c = cos(angle);
     float s = sin(angle);
 
-    return matrix(
+    return Matrix(
         c, 0.0f, s, 0.0f,       // LINHA 1
         0.0f, 1.0f, 0.0f, 0.0f, // LINHA 2
         -s, 0.0f, c, 0.0f,      // LINHA 3
@@ -129,12 +129,12 @@ namespace Matrices
   //   R*p = [ c*px-s*py, s*px+c*py, pz, pw ];
   //
   // onde 'c' e 's' são o cosseno e o seno do ângulo de rotação, respectivamente.
-  glm::mat4 matrixRotateZ(float angle)
+  glm::mat4 MatrixRotateZ(float angle)
   {
     float c = cos(angle);
     float s = sin(angle);
 
-    return matrix(
+    return Matrix(
         c, -s, 0.0f, 0.0f,      // LINHA 1
         s, c, 0.0f, 0.0f,       // LINHA 2
         0.0f, 0.0f, 1.0f, 0.0f, // LINHA 3
@@ -144,7 +144,7 @@ namespace Matrices
 
   // Função que calcula a norma Euclidiana de um vetor cujos coeficientes são
   // definidos em uma base ortonormal qualquer.
-  float norm(glm::vec4 v)
+  float Norm(glm::vec4 v)
   {
     float vx = v.x;
     float vy = v.y;
@@ -157,18 +157,18 @@ namespace Matrices
   // coordenadas e em torno do eixo definido pelo vetor 'axis'. Esta matriz pode
   // ser definida pela fórmula de Rodrigues. Lembre-se que o vetor que define o
   // eixo de rotação deve ser normalizado!
-  glm::mat4 matrixRotate(float angle, glm::vec4 axis)
+  glm::mat4 MatrixRotate(float angle, glm::vec4 axis)
   {
     float c = cos(angle);
     float s = sin(angle);
 
-    glm::vec4 v = axis / norm(axis);
+    glm::vec4 v = axis / Norm(axis);
 
     float vx = v.x;
     float vy = v.y;
     float vz = v.z;
 
-    return matrix(
+    return Matrix(
         vx * vx * (1 - c) + c, vx * vy * (1 - c) - vz * s, vx * vz * (1 - c) + vy * s, 0.0f, // LINHA 1
         vx * vy * (1 - c) + vz * s, vy * vy * (1 - c) + c, vy * vz * (1 - c) + vx * s, 0.0f, // LINHA 2
         vx * vz * (1 - c) - vy * s, vy * vz * (1 - c) + vx * s, vz * vz * (1 - c) + c, 0.0f, // LINHA 3
@@ -178,7 +178,7 @@ namespace Matrices
 
   // Produto vetorial entre dois vetores u e v definidos em um sistema de
   // coordenadas ortonormal.
-  glm::vec4 crossproduct(glm::vec4 u, glm::vec4 v)
+  glm::vec4 CrossProduct(glm::vec4 u, glm::vec4 v)
   {
     float u1 = u.x;
     float u2 = u.y;
@@ -197,7 +197,7 @@ namespace Matrices
 
   // Produto escalar entre dois vetores u e v definidos em um sistema de
   // coordenadas ortonormal.
-  float dotproduct(glm::vec4 u, glm::vec4 v)
+  float DotProduct(glm::vec4 u, glm::vec4 v)
   {
     float u1 = u.x;
     float u2 = u.y;
@@ -218,16 +218,16 @@ namespace Matrices
   }
 
   // Matriz de mudança de coordenadas para o sistema de coordenadas da Câmera.
-  glm::mat4 matrixCameraView(glm::vec4 position_c, glm::vec4 view_vector, glm::vec4 up_vector)
+  glm::mat4 MatrixCameraView(glm::vec4 position_c, glm::vec4 view_vector, glm::vec4 up_vector)
   {
-    glm::vec4 w = -view_vector / norm(view_vector);
-    glm::vec4 u = (crossproduct(up_vector, w)) / norm(crossproduct(up_vector, w));
+    glm::vec4 w = -view_vector / Norm(view_vector);
+    glm::vec4 u = (CrossProduct(up_vector, w)) / Norm(CrossProduct(up_vector, w));
 
     // Normalizamos os vetores u e w
-    w = w / norm(w);
-    u = u / norm(u);
+    w = w / Norm(w);
+    u = u / Norm(u);
 
-    glm::vec4 v = crossproduct(w, u);
+    glm::vec4 v = CrossProduct(w, u);
 
     glm::vec4 origin_o = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -243,18 +243,18 @@ namespace Matrices
     float wy = w.y;
     float wz = w.z;
 
-    return matrix(
-        ux, uy, uz, dotproduct(-u, c), // LINHA 1
-        vx, vy, vz, dotproduct(-v, c), // LINHA 2
-        wx, wy, wz, dotproduct(-w, c), // LINHA 3
+    return Matrix(
+        ux, uy, uz, DotProduct(-u, c), // LINHA 1
+        vx, vy, vz, DotProduct(-v, c), // LINHA 2
+        wx, wy, wz, DotProduct(-w, c), // LINHA 3
         0.0f, 0.0f, 0.0f, 1.0f         // LINHA 4
     );
   }
 
   // Matriz de projeção paralela ortográfica
-  glm::mat4 matrixOrthographic(float l, float r, float b, float t, float n, float f)
+  glm::mat4 MatrixOrthographic(float l, float r, float b, float t, float n, float f)
   {
-    glm::mat4 M = matrix(
+    glm::mat4 M = Matrix(
         2 / (r - l), 0.0f, 0.0f, -(r + l) / (r - l), // LINHA 1
         0.0f, 2 / (t - b), 0.0f, -(t + b) / (t - b), // LINHA 2
         0.0f, 0.0f, 2 / (f - n), -(f + n) / (f - n), // LINHA 3
@@ -265,14 +265,14 @@ namespace Matrices
   }
 
   // Matriz de projeção perspectiva
-  glm::mat4 matrixPerspective(float field_of_view, float aspect, float n, float f)
+  glm::mat4 MatrixPerspective(float field_of_view, float aspect, float n, float f)
   {
     float t = fabs(n) * tanf(field_of_view / 2.0f);
     float b = -t;
     float r = t * aspect;
     float l = -r;
 
-    glm::mat4 P = matrix(
+    glm::mat4 P = Matrix(
         n, 0.0f, 0.0f, 0.0f,       // LINHA 1
         0.0f, n, 0.0f, 0.0f,       // LINHA 2
         0.0f, 0.0f, n + f, -f * n, // LINHA 3
@@ -280,7 +280,7 @@ namespace Matrices
     );
 
     // A matriz M é a mesma computada acima em Matrix_Orthographic().
-    glm::mat4 M = matrixOrthographic(l, r, b, t, n, f);
+    glm::mat4 M = MatrixOrthographic(l, r, b, t, n, f);
 
     // Note que as matrizes M*P e -M*P fazem exatamente a mesma projeção
     // perspectiva, já que o sinal de negativo não irá afetar o resultado
@@ -320,7 +320,7 @@ namespace Matrices
   }
 
   // Função que imprime uma matriz M no terminal
-  void printMatrix(glm::mat4 M)
+  void PrintMatrix(glm::mat4 M)
   {
     printf("\n");
     printf("[ %+0.2f  %+0.2f  %+0.2f  %+0.2f ]\n", M[0][0], M[1][0], M[2][0], M[3][0]);
@@ -330,7 +330,7 @@ namespace Matrices
   }
 
   // Função que imprime um vetor v no terminal
-  void printVector(glm::vec4 v)
+  void PrintVector(glm::vec4 v)
   {
     printf("\n");
     printf("[ %+0.2f ]\n", v[0]);
@@ -340,7 +340,7 @@ namespace Matrices
   }
 
   // Função que imprime o produto de uma matriz por um vetor no terminal
-  void printMatrixVectorProduct(glm::mat4 M, glm::vec4 v)
+  void PrintMatrixVectorProduct(glm::mat4 M, glm::vec4 v)
   {
     auto r = M * v;
     printf("\n");
@@ -352,7 +352,7 @@ namespace Matrices
 
   // Função que imprime o produto de uma matriz por um vetor, junto com divisão
   // por w, no terminal.
-  void printMatrixVectorProductDivW(glm::mat4 M, glm::vec4 v)
+  void PrintMatrixVectorProductDivW(glm::mat4 M, glm::vec4 v)
   {
     auto r = M * v;
     auto w = r[3];

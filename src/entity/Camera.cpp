@@ -9,67 +9,67 @@ Camera::Camera(float nearplane = -0.1f, float farplane = -620.0f, float fieldOfV
       m_Farplane(farplane),
       m_FOV(fieldOfView)
 {
-  updateCameraVectors();
+  UpdateCameraVectors();
 }
 
-void Camera::updatePosition(glm::vec4 newPosition)
+void Camera::UpdatePosition(glm::vec4 newPosition)
 {
   m_CameraCenter = newPosition;
 }
 
-void Camera::updateCameraAngles(float theta, float phi)
+void Camera::UpdateCameraAngles(float theta, float phi)
 {
   m_CameraTheta = theta;
   m_CameraPhi = phi;
 
-  updateCameraVectors();
+  UpdateCameraVectors();
 }
 
-void Camera::usePerspective()
+void Camera::UsePerspective()
 {
   m_UsePerspective = true;
 }
 
-void Camera::useOrthographic()
+void Camera::UseOrthographic()
 {
   m_UsePerspective = false;
 }
 
-float Camera::getCameraTheta() const
+float Camera::GetCameraTheta() const
 {
   return m_CameraTheta;
 }
 
-float Camera::getCameraPhi() const
+float Camera::GetCameraPhi() const
 {
   return m_CameraPhi;
 }
 
-glm::vec4 Camera::getPosition() const
+glm::vec4 Camera::GetPosition() const
 {
   return m_CameraCenter;
 }
 
-glm::vec4 Camera::getTarget() const
+glm::vec4 Camera::GetTarget() const
 {
   return m_CameraFront;
 }
 
-glm::vec4 Camera::getRight() const
+glm::vec4 Camera::GetRight() const
 {
   return m_CameraRight;
 }
 
-glm::mat4 Camera::computeViewMatrix() const
+glm::mat4 Camera::ComputeViewMatrix() const
 {
-  return Matrices::matrixCameraView(m_CameraCenter, m_CameraFront, m_CameraUp);
+  return Matrices::MatrixCameraView(m_CameraCenter, m_CameraFront, m_CameraUp);
 }
 
-glm::mat4 Camera::computeProjectionMatrix() const
+glm::mat4 Camera::ComputeProjectionMatrix() const
 {
   if (m_UsePerspective)
   {
-    return Matrices::matrixPerspective(m_FOV, g_Ratio, m_Nearplane, m_Farplane);
+    return Matrices::MatrixPerspective(m_FOV, g_Ratio, m_Nearplane, m_Farplane);
   }
 
   float t = 1.5f * m_CameraDistance / 2.5f;
@@ -77,5 +77,5 @@ glm::mat4 Camera::computeProjectionMatrix() const
   float r = t * g_Ratio;
   float l = -r;
 
-  return Matrices::matrixOrthographic(l, r, b, t, m_Nearplane, m_Farplane);
+  return Matrices::MatrixOrthographic(l, r, b, t, m_Nearplane, m_Farplane);
 }

@@ -24,7 +24,7 @@ private:
   const float m_Farplane;
   const float m_FOV;
 
-  void updateCameraVectors()
+  void UpdateCameraVectors()
   {
     float x = cos(m_CameraPhi) * sin(m_CameraTheta);
     float y = sin(m_CameraPhi);
@@ -32,30 +32,30 @@ private:
 
     m_CameraFront = glm::normalize(glm::vec4(x, y, z, 0.0f));
 
-    glm::vec4 w = -m_CameraFront / Matrices::norm(m_CameraFront);
+    glm::vec4 w = -m_CameraFront / Matrices::Norm(m_CameraFront);
 
-    m_CameraRight = Matrices::crossproduct(m_CameraUp, w) / Matrices::norm(Matrices::crossproduct(m_CameraUp, w));
+    m_CameraRight = Matrices::CrossProduct(m_CameraUp, w) / Matrices::Norm(Matrices::CrossProduct(m_CameraUp, w));
   };
 
 public:
   Camera(float nearplane, float farplane, float fieldOfView);
   ~Camera() {}
 
-  void updatePosition(glm::vec4 newPosition);
-  void updateCameraAngles(float theta, float phi);
+  void UpdatePosition(glm::vec4 newPosition);
+  void UpdateCameraAngles(float theta, float phi);
 
-  void usePerspective();
-  void useOrthographic();
+  void UsePerspective();
+  void UseOrthographic();
 
-  float getCameraTheta() const;
-  float getCameraPhi() const;
+  float GetCameraTheta() const;
+  float GetCameraPhi() const;
 
-  glm::vec4 getPosition() const;
-  glm::vec4 getTarget() const;
-  glm::vec4 getRight() const;
+  glm::vec4 GetPosition() const;
+  glm::vec4 GetTarget() const;
+  glm::vec4 GetRight() const;
 
-  glm::mat4 computeViewMatrix() const;
-  glm::mat4 computeProjectionMatrix() const;
+  glm::mat4 ComputeViewMatrix() const;
+  glm::mat4 ComputeProjectionMatrix() const;
 };
 
 #endif

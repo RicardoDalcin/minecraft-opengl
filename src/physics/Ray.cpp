@@ -38,7 +38,7 @@ bool Ray::RayCast(glm::vec4 origin, glm::vec4 direction, World *data, bool (*cal
 
   glm::vec3 tdelta = glm::vec3(step.x / direction.x, step.y / direction.y, step.z / direction.z);
 
-  float radius = m_Length / Matrices::norm(glm::vec4(direction.x, direction.y, direction.z, 0.0f));
+  float radius = m_Length / Matrices::Norm(glm::vec4(direction.x, direction.y, direction.z, 0.0f));
 
   while (true)
   {

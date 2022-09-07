@@ -53,10 +53,10 @@ bool Window::Init()
     return false;
   }
 
-  glfwSetKeyCallback(window, Input::keyCallback);
-  glfwSetMouseButtonCallback(window, Input::mouseButtonCallback);
-  glfwSetCursorPosCallback(window, Input::cursorPositionCallback);
-  glfwSetScrollCallback(window, Input::scrollCallback);
+  glfwSetKeyCallback(window, Input::KeyCallback);
+  glfwSetMouseButtonCallback(window, Input::MouseButtonCallback);
+  glfwSetCursorPosCallback(window, Input::CursorPositionCallback);
+  glfwSetScrollCallback(window, Input::ScrollCallback);
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

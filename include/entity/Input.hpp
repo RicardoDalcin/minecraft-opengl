@@ -30,22 +30,22 @@ private:
   static std::vector<ScrollCallbackType> scrollCallbacks;
 
 public:
-  static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-  static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
-  static void cursorPositionCallback(GLFWwindow *window, double xpos, double ypos);
-  static void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+  static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+  static void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+  static void CursorPositionCallback(GLFWwindow *window, double xpos, double ypos);
+  static void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
-  static bool isKeyPressed(int key);
-  static bool isMouseButtonPressed(int button);
+  static bool IsKeyPressed(int key);
+  static bool IsMouseButtonPressed(int button);
 
-  static glm::vec2 getMousePosition();
-  static glm::vec2 getDeltaMousePosition();
+  static glm::vec2 GetMousePosition();
+  static glm::vec2 GetDeltaMousePosition();
 
-  static void resetDeltas();
+  static void ResetDeltas();
 
-  static void registerKeyCallback(KeyCallbackType callback);
-  static void registerMouseButtonCallback(MouseButtonCallbackType callback);
-  static void registerScrollCallback(ScrollCallbackType callback);
+  static void RegisterKeyCallback(KeyCallbackType callback);
+  static void RegisterMouseButtonCallback(MouseButtonCallbackType callback);
+  static void RegisterScrollCallback(ScrollCallbackType callback);
 };
 
 #endif

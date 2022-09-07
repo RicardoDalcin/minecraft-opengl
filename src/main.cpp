@@ -73,8 +73,8 @@ int main()
 
     printf("Elapsed time: %f \n", (float)std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
-    Input::registerMouseButtonCallback(std::bind(&Character::OnClick, &player, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    Input::registerScrollCallback(std::bind(&Character::OnScroll, &player, std::placeholders::_1, std::placeholders::_2));
+    Input::RegisterMouseButtonCallback(std::bind(&Character::OnClick, &player, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    Input::RegisterScrollCallback(std::bind(&Character::OnScroll, &player, std::placeholders::_1, std::placeholders::_2));
 
     while (!Window::GetShouldClose())
     {
@@ -86,29 +86,29 @@ int main()
 
       printf("FPS: %f \n", fps);
 
-      if (Input::isKeyPressed(GLFW_KEY_O))
+      if (Input::IsKeyPressed(GLFW_KEY_O))
       {
-        camera.useOrthographic();
+        camera.UseOrthographic();
       }
 
-      if (Input::isKeyPressed(GLFW_KEY_P))
+      if (Input::IsKeyPressed(GLFW_KEY_P))
       {
-        camera.usePerspective();
+        camera.UsePerspective();
       }
 
-      if (Input::isKeyPressed(GLFW_KEY_V))
+      if (Input::IsKeyPressed(GLFW_KEY_V))
       {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       }
 
-      if (Input::isKeyPressed(GLFW_KEY_B))
+      if (Input::IsKeyPressed(GLFW_KEY_B))
       {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
       player.Update(&camera, &world);
 
-      world.Draw(&camera, camera.computeViewMatrix(), camera.computeProjectionMatrix());
+      world.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
 
       UserInterface::DrawUI(&interfaceShader, world.GetTextureAtlas(), player.GetHotbarPosition());
 

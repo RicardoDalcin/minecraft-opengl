@@ -44,10 +44,10 @@ void Character::SetHotbarItem(int position, int id)
 
 void Character::Update(Camera *camera, World *world)
 {
-  glm::vec2 deltaPos = Input::getDeltaMousePosition();
+  glm::vec2 deltaPos = Input::GetDeltaMousePosition();
 
-  float newTheta = camera->getCameraTheta() - 0.003f * deltaPos.x;
-  float newPhi = camera->getCameraPhi() - 0.003f * deltaPos.y;
+  float newTheta = camera->GetCameraTheta() - 0.003f * deltaPos.x;
+  float newPhi = camera->GetCameraPhi() - 0.003f * deltaPos.y;
 
   // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
   float phimax = 3.141592f / 2;
@@ -59,43 +59,43 @@ void Character::Update(Camera *camera, World *world)
   if (newPhi < phimin)
     newPhi = phimin;
 
-  camera->updateCameraAngles(newTheta, newPhi);
-  Input::resetDeltas();
+  camera->UpdateCameraAngles(newTheta, newPhi);
+  Input::ResetDeltas();
 
-  float baseSpeed = Input::isKeyPressed(GLFW_KEY_LEFT_CONTROL) ? m_RunSpeed : m_BaseSpeed;
+  float baseSpeed = Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) ? m_RunSpeed : m_BaseSpeed;
 
   float speed = baseSpeed * Window::GetDeltaTime();
 
-  glm::vec4 newCameraPosition = camera->getPosition();
+  glm::vec4 newCameraPosition = camera->GetPosition();
 
-  if (Input::isKeyPressed(GLFW_KEY_W))
+  if (Input::IsKeyPressed(GLFW_KEY_W))
   {
-    newCameraPosition += camera->getTarget() * speed;
+    newCameraPosition += camera->GetTarget() * speed;
   }
 
-  if (Input::isKeyPressed(GLFW_KEY_S))
+  if (Input::IsKeyPressed(GLFW_KEY_S))
   {
-    newCameraPosition -= camera->getTarget() * speed;
+    newCameraPosition -= camera->GetTarget() * speed;
   }
 
-  if (Input::isKeyPressed(GLFW_KEY_A))
+  if (Input::IsKeyPressed(GLFW_KEY_A))
   {
-    newCameraPosition -= camera->getRight() * speed;
+    newCameraPosition -= camera->GetRight() * speed;
   }
 
-  if (Input::isKeyPressed(GLFW_KEY_D))
+  if (Input::IsKeyPressed(GLFW_KEY_D))
   {
-    newCameraPosition += camera->getRight() * speed;
+    newCameraPosition += camera->GetRight() * speed;
   }
 
-  camera->updatePosition(newCameraPosition);
+  camera->UpdatePosition(newCameraPosition);
 
   Ray ray(5.5f);
 
   glm::vec3 pos;
   glm::vec3 dir;
 
-  if (ray.RayCast(camera->getPosition(), camera->getTarget(), world, World::RayCastCallback, &pos, &dir))
+  if (ray.RayCast(camera->GetPosition(), camera->GetTarget(), world, World::RayCastCallback, &pos, &dir))
   {
     if (m_ShouldPickBlock)
     {
@@ -144,7 +144,7 @@ void Character::OnClick(int button, int action, int mods)
 
 void Character::OnScroll(double xoffset, double yoffset)
 {
-  if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+  if (Input::IsKeyPressed(GLFW_KEY_LEFT_SHIFT))
   {
     int newBlock = m_Hotbar[m_HotbarPosition] - (int)yoffset;
 

@@ -37,7 +37,7 @@ namespace Matrices
     );
 
     // Matriz identidade.
-    glm::mat4 matrixIdentity();
+    glm::mat4 MatrixIdentity();
 
     // Matriz de translação T. Seja p=[px,py,pz,pw] um ponto e t=[tx,ty,tz,0] um
     // vetor em coordenadas homogêneas, definidos em um sistema de coordenadas
@@ -45,7 +45,7 @@ namespace Matrices
     //
     //     T*p = p+t.
     //
-    glm::mat4 matrixTranslate(float tx, float ty, float tz);
+    glm::mat4 MatrixTranslate(float tx, float ty, float tz);
 
     // Matriz S de "escalamento de um ponto" em relação à origem do sistema de
     // coordenadas. Seja p=[px,py,pz,pw] um ponto em coordenadas homogêneas.
@@ -53,7 +53,7 @@ namespace Matrices
     //
     //     S*p = [sx*px, sy*py, sz*pz, pw].
     //
-    glm::mat4 matrixScale(float sx, float sy, float sz);
+    glm::mat4 MatrixScale(float sx, float sy, float sz);
 
     // Matriz R de "rotação de um ponto" em relação à origem do sistema de
     // coordenadas e em torno do eixo X (primeiro vetor da base do sistema de
@@ -63,7 +63,7 @@ namespace Matrices
     //   R*p = [ px, c*py-s*pz, s*py+c*pz, pw ];
     //
     // onde 'c' e 's' são o cosseno e o seno do ângulo de rotação, respectivamente.
-    glm::mat4 matrixRotateX(float angle);
+    glm::mat4 MatrixRotateX(float angle);
 
     // Matriz R de "rotação de um ponto" em relação à origem do sistema de
     // coordenadas e em torno do eixo Y (segundo vetor da base do sistema de
@@ -73,7 +73,7 @@ namespace Matrices
     //   R*p = [ c*px+s*pz, py, -s*px+c*pz, pw ];
     //
     // onde 'c' e 's' são o cosseno e o seno do ângulo de rotação, respectivamente.
-    glm::mat4 matrixRotateY(float angle);
+    glm::mat4 MatrixRotateY(float angle);
 
     // Matriz R de "rotação de um ponto" em relação à origem do sistema de
     // coordenadas e em torno do eixo Z (terceiro vetor da base do sistema de
@@ -83,47 +83,47 @@ namespace Matrices
     //   R*p = [ c*px-s*py, s*px+c*py, pz, pw ];
     //
     // onde 'c' e 's' são o cosseno e o seno do ângulo de rotação, respectivamente.
-    glm::mat4 matrixRotateZ(float angle);
+    glm::mat4 MatrixRotateZ(float angle);
 
     // Função que calcula a norma Euclidiana de um vetor cujos coeficientes são
     // definidos em uma base ortonormal qualquer.
-    float norm(glm::vec4 v);
+    float Norm(glm::vec4 v);
 
     // Matriz R de "rotação de um ponto" em relação à origem do sistema de
     // coordenadas e em torno do eixo definido pelo vetor 'axis'. Esta matriz pode
     // ser definida pela fórmula de Rodrigues. Lembre-se que o vetor que define o
     // eixo de rotação deve ser normalizado!
-    glm::mat4 matrixRotate(float angle, glm::vec4 axis);
+    glm::mat4 MatrixRotate(float angle, glm::vec4 axis);
 
     // Produto vetorial entre dois vetores u e v definidos em um sistema de
     // coordenadas ortonormal.
-    glm::vec4 crossproduct(glm::vec4 u, glm::vec4 v);
+    glm::vec4 CrossProduct(glm::vec4 u, glm::vec4 v);
 
     // Produto escalar entre dois vetores u e v definidos em um sistema de
     // coordenadas ortonormal.
-    float dotproduct(glm::vec4 u, glm::vec4 v);
+    float DotProduct(glm::vec4 u, glm::vec4 v);
 
     // Matriz de mudança de coordenadas para o sistema de coordenadas da Câmera.
-    glm::mat4 matrixCameraView(glm::vec4 position_c, glm::vec4 view_vector, glm::vec4 up_vector);
+    glm::mat4 MatrixCameraView(glm::vec4 position_c, glm::vec4 view_vector, glm::vec4 up_vector);
 
     // Matriz de projeção paralela ortográfica
-    glm::mat4 matrixOrthographic(float l, float r, float b, float t, float n, float f);
+    glm::mat4 MatrixOrthographic(float l, float r, float b, float t, float n, float f);
 
     // Matriz de projeção perspectiva
-    glm::mat4 matrixPerspective(float field_of_view, float aspect, float n, float f);
+    glm::mat4 MatrixPerspective(float field_of_view, float aspect, float n, float f);
 
     // Função que imprime uma matriz M no terminal
-    void printMatrix(glm::mat4 M);
+    void PrintMatrix(glm::mat4 M);
 
     // Função que imprime um vetor v no terminal
-    void printVector(glm::vec4 v);
+    void PrintVector(glm::vec4 v);
 
     // Função que imprime o produto de uma matriz por um vetor no terminal
-    void printMatrixVectorProduct(glm::mat4 M, glm::vec4 v);
+    void PrintMatrixVectorProduct(glm::mat4 M, glm::vec4 v);
 
     // Função que imprime o produto de uma matriz por um vetor, junto com divisão
     // por w, no terminal.
-    void printMatrixVectorProductDivW(glm::mat4 M, glm::vec4 v);
+    void PrintMatrixVectorProductDivW(glm::mat4 M, glm::vec4 v);
 }
 
 #endif // _MATRICES_H
