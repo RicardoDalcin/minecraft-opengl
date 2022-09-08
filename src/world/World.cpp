@@ -91,7 +91,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
   }
 }
 
-bool World::RayCastCallback(World *data, glm::vec3 position)
+bool World::RayCastCallback(World *data, glm::vec4 position)
 {
   int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;
   int chunkZ = (int)position.z / WorldConstants::CHUNK_SIZE;

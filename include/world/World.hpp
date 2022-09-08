@@ -38,7 +38,7 @@ public:
   World(Shader *shader);
   ~World();
 
-  static bool RayCastCallback(World *data, glm::vec3 position);
+  static bool RayCastCallback(World *data, glm::vec4 position);
 
   void UpdateChunkMesh(glm::vec2 position);
 

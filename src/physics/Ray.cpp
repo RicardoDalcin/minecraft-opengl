@@ -11,90 +11,89 @@ Ray::~Ray()
 {
 }
 
-int sign(float x)
+int Ray::Sign(float x)
 {
   return x > 0 ? 1 : x < 0 ? -1
                            : 0;
 }
 
-glm::vec3 intbound(glm::vec3 s, glm::vec3 ds)
+glm::vec3 Ray::Intbound(glm::vec3 point, glm::vec3 direction)
 {
-  glm::vec3 v;
+  glm::vec3 bound;
 
   for (size_t i = 0; i < 3; i++)
   {
-    v[i] = (ds[i] > 0 ? (ceilf(s[i]) - s[i]) : (s[i] - floorf(s[i]))) / fabsf(ds[i]);
+    bound[i] = (direction[i] > 0 ? (ceilf(point[i]) - point[i]) : (point[i] - floorf(point[i]))) / fabsf(direction[i]);
   }
-  return v;
+
+  return bound;
 }
 
-bool Ray::RayCast(glm::vec4 origin, glm::vec4 direction, World *data, bool (*callback)(World *, glm::vec3), glm::vec3 *out, glm::vec3 *directionOut)
+bool Ray::RayCast(glm::vec4 origin, glm::vec4 direction, World *data, bool (*callback)(World *, glm::vec4), glm::vec3 *out, glm::vec3 *directionOut)
 {
-  glm::vec3 p = glm::vec3(floorf(origin.x), floorf(origin.y), floorf(origin.z));
+  glm::vec3 step = glm::vec3(Sign(direction.x), Sign(direction.y), Sign(direction.z));
 
-  glm::vec3 step = glm::vec3(sign(direction.x), sign(direction.y), sign(direction.z));
+  glm::vec3 rayMax = Intbound(origin, direction);
 
-  glm::vec3 tmax = intbound(origin, direction);
+  glm::vec3 rayDelta = glm::vec3(step.x / direction.x, step.y / direction.y, step.z / direction.z);
 
-  glm::vec3 tdelta = glm::vec3(step.x / direction.x, step.y / direction.y, step.z / direction.z);
-
-  float radius = m_Length / Matrices::Norm(glm::vec4(direction.x, direction.y, direction.z, 0.0f));
+  float radius = m_Length / Matrices::Norm(direction);
 
   while (true)
   {
-    if (callback(data, p))
+    if (callback(data, origin))
     {
-      *out = p;
+      *out = origin;
       return true;
     }
 
-    if (tmax.x < tmax.y)
+    if (rayMax.x < rayMax.y)
     {
-      if (tmax.x < tmax.z)
+      if (rayMax.x < rayMax.z)
       {
-        if (tmax.x > radius)
+        if (rayMax.x > radius)
         {
           break;
         }
 
-        p.x += step.x;
-        tmax.x += tdelta.x;
+        origin.x += step.x;
+        rayMax.x += rayDelta.x;
         *directionOut = glm::vec3(-step.x, 0.0f, 0.0f);
       }
       else
       {
-        if (tmax.z > radius)
+        if (rayMax.z > radius)
         {
           break;
         }
 
-        p.z += step.z;
-        tmax.z += tdelta.z;
+        origin.z += step.z;
+        rayMax.z += rayDelta.z;
         *directionOut = glm::vec3(0.0f, 0.0f, -step.z);
       }
     }
     else
     {
-      if (tmax.y < tmax.z)
+      if (rayMax.y < rayMax.z)
       {
-        if (tmax.y > radius)
+        if (rayMax.y > radius)
         {
           break;
         }
 
-        p.y += step.y;
-        tmax.y += tdelta.y;
+        origin.y += step.y;
+        rayMax.y += rayDelta.y;
         *directionOut = glm::vec3(0.0f, -step.y, 0.0f);
       }
       else
       {
-        if (tmax.z > radius)
+        if (rayMax.z > radius)
         {
           break;
         }
 
-        p.z += step.z;
-        tmax.z += tdelta.z;
+        origin.z += step.z;
+        rayMax.z += rayDelta.z;
         *directionOut = glm::vec3(0.0f, 0.0f, -step.z);
       }
     }
