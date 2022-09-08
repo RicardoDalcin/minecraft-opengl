@@ -36,29 +36,20 @@ void UserInterface::UpdateHotbarPosition(int position, std::array<glm::vec2, 4> 
 
   float slotCenterX = (-(int)floor(UI_HOTBAR_SIZE / 2) * hotbarSlotSize * 2 + position * hotbarSlotSize * 2) / width;
 
-  hotbarVertices[position * 20 + 0] = slotCenterX + xUnit;
-  hotbarVertices[position * 20 + 1] = hotbarCenterY + (16 / width) + yUnit;
-  hotbarVertices[position * 20 + 2] = 0.0f;
-  hotbarVertices[position * 20 + 3] = textureCoords[0].x;
-  hotbarVertices[position * 20 + 4] = textureCoords[0].y;
+  int hotbarVertexPosition = position * 20;
+  float yCenter = hotbarCenterY + (16 / width);
 
-  hotbarVertices[position * 20 + 5] = slotCenterX - xUnit;
-  hotbarVertices[position * 20 + 6] = hotbarCenterY + (16 / width) + yUnit;
-  hotbarVertices[position * 20 + 7] = 0.0f;
-  hotbarVertices[position * 20 + 8] = textureCoords[1].x;
-  hotbarVertices[position * 20 + 9] = textureCoords[1].y;
+  for (int i = 0; i < 4; i++)
+  {
+    float xUnitSigned = i == 0 || i == 3 ? xUnit : -xUnit;
+    float yUnitSigned = i == 0 || i == 1 ? yUnit : -yUnit;
 
-  hotbarVertices[position * 20 + 10] = slotCenterX - xUnit;
-  hotbarVertices[position * 20 + 11] = hotbarCenterY + (16 / width) - yUnit;
-  hotbarVertices[position * 20 + 12] = 0.0f;
-  hotbarVertices[position * 20 + 13] = textureCoords[2].x;
-  hotbarVertices[position * 20 + 14] = textureCoords[2].y;
-
-  hotbarVertices[position * 20 + 15] = slotCenterX + xUnit;
-  hotbarVertices[position * 20 + 16] = hotbarCenterY + (16 / width) - yUnit;
-  hotbarVertices[position * 20 + 17] = 0.0f;
-  hotbarVertices[position * 20 + 18] = textureCoords[3].x;
-  hotbarVertices[position * 20 + 19] = textureCoords[3].y;
+    hotbarVertices[hotbarVertexPosition + i * 5 + 0] = slotCenterX + xUnitSigned;
+    hotbarVertices[hotbarVertexPosition + i * 5 + 1] = yCenter + yUnitSigned;
+    hotbarVertices[hotbarVertexPosition + i * 5 + 2] = 0.0f;
+    hotbarVertices[hotbarVertexPosition + i * 5 + 3] = textureCoords[i].x;
+    hotbarVertices[hotbarVertexPosition + i * 5 + 4] = textureCoords[i].y;
+  }
 
   hotbarIndices[position * 6 + 0] = 0 + position * 4;
   hotbarIndices[position * 6 + 1] = 1 + position * 4;

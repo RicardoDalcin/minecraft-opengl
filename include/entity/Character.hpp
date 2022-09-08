@@ -18,12 +18,11 @@ const int HOTBAR_SIZE = 9;
 class Character
 {
 private:
-  const float m_BaseSpeed = 5.0f;
-  const float m_RunSpeed = 100.0f;
+  const float BREAK_COOLDOWN = 0.2f;
+  const float BASE_SPEED = 5.0f;
+  const float RUN_SPEED = 100.0f;
 
   glm::vec4 m_Position;
-
-  const float BREAK_COOLDOWN = 0.2f;
 
   bool m_ShouldBreakBlock = false;
   bool m_ShouldPlaceBlock = false;

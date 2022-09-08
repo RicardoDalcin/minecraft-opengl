@@ -56,8 +56,6 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
   m_Shader->SetUniformMat4f("uView", view);
   m_Shader->SetUniformMat4f("uProjection", projection);
 
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
   m_TextureAtlas->Bind(0);
   m_Shader->SetUniform1i("uTexture", 0);
 

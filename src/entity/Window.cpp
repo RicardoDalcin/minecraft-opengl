@@ -13,7 +13,7 @@ int Window::height = 0.0f;
 
 GLFWwindow *Window::window = nullptr;
 
-bool Window::Init()
+bool Window::Init(bool fullscreen)
 {
   if (!glfwInit())
     return false;
@@ -32,21 +32,31 @@ bool Window::Init()
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+  int windowWidth;
+  int windowHeight;
 
-  int windowWidth = mode->width;
-  int windowHeight = mode->height;
+  if (fullscreen)
+  {
+    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-  // int windowWidth = 1280;
-  // int windowHeight = 720;
+    windowWidth = mode->width;
+    windowHeight = mode->height;
 
-  height = windowHeight;
+    window = glfwCreateWindow(windowWidth, windowHeight, "Minecraft", glfwGetPrimaryMonitor(), NULL);
+  }
+  else
+  {
+    windowWidth = 1280;
+    windowHeight = 720;
+
+    window = glfwCreateWindow(windowWidth, windowHeight, "Minecraft", NULL, NULL);
+  }
+
   width = windowWidth;
+  height = windowHeight;
 
   screenRatio = (float)windowWidth / windowHeight;
 
-  window = glfwCreateWindow(windowWidth, windowHeight, "Minecraft", glfwGetPrimaryMonitor(), NULL);
-  // window = glfwCreateWindow(windowWidth, windowHeight, "Minecraft", NULL, NULL);
   if (!window)
   {
     glfwTerminate();

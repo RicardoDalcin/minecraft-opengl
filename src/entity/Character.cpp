@@ -31,6 +31,7 @@ void Character::SetHotbarItem(int position, int id)
 
   BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(id);
 
+  // Icon texture is the face, but leaves use the top texture
   int offset = blockInfo.blockId.find("_leaves") != std::string::npos ? 24 : 0;
 
   std::array<glm::vec2, 4> faceCoords = {
@@ -59,10 +60,11 @@ void Character::Update(Camera *camera, World *world)
   if (newPhi < phimin)
     newPhi = phimin;
 
+  // Process new angles and reset deltas
   camera->UpdateCameraAngles(newTheta, newPhi);
   Input::ResetDeltas();
 
-  float baseSpeed = Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) ? m_RunSpeed : m_BaseSpeed;
+  float baseSpeed = Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) ? RUN_SPEED : BASE_SPEED;
 
   float speed = baseSpeed * Window::GetDeltaTime();
 

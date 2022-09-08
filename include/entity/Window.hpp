@@ -18,7 +18,7 @@ private:
   static GLFWwindow *window;
 
 public:
-  static bool Init();
+  static bool Init(bool fullscreen = true);
   static void Tick();
   static void EndFrame();
   static void Terminate();
