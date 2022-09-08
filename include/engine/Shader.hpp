@@ -40,4 +40,4 @@ private:
   int GetUniformLocation(const std::string &name);
 };
 
-#endif // _SHADER_H
+#endif

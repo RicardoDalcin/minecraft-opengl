@@ -14,4 +14,4 @@ public:
   void Unbind() const;
 };
 
-#endif // _VERTEXBUFFER_H
+#endif

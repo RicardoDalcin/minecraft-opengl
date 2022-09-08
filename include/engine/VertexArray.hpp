@@ -20,4 +20,4 @@ public:
   void Unbind() const;
 };
 
-#endif // _VERTEXARRAY_H
+#endif

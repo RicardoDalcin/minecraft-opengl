@@ -126,4 +126,4 @@ namespace Matrices
     void PrintMatrixVectorProductDivW(glm::mat4 M, glm::vec4 v);
 }
 
-#endif // _MATRICES_H
+#endif

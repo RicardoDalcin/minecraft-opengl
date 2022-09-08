@@ -22,4 +22,4 @@ public:
   inline int GetHeight() const { return m_Height; }
 };
 
-#endif // _TEXTURE_H
+#endif
