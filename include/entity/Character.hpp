@@ -54,7 +54,11 @@ public:
   glm::vec4 GetPosition() const { return m_Position; }
 
   void UseFreeControls() { m_UseFreeControls = true; }
-  void UseNormalControls() { m_UseFreeControls = false; }
+  void UseNormalControls()
+  {
+    m_UseFreeControls = false;
+    m_FallingTime = 0.0f;
+  }
 
   void SetHotbarItem(int position, int id);
 
