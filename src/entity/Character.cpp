@@ -72,12 +72,36 @@ void Character::Update(Camera *camera, World *world)
 
   if (Input::IsKeyPressed(GLFW_KEY_W))
   {
-    newCameraPosition += camera->GetTarget() * speed;
+    glm::vec4 cameraTarget = camera->GetTarget();
+
+    if (m_UseFreeControls)
+    {
+      newCameraPosition += cameraTarget * speed;
+    }
+    else
+    {
+      glm::vec4 normalizedTarget = glm::vec4(cameraTarget.x, 0.0f, cameraTarget.z, 0.0f);
+      normalizedTarget = normalizedTarget / Matrices::Norm(normalizedTarget);
+
+      newCameraPosition += normalizedTarget * speed;
+    }
   }
 
   if (Input::IsKeyPressed(GLFW_KEY_S))
   {
-    newCameraPosition -= camera->GetTarget() * speed;
+    glm::vec4 cameraTarget = camera->GetTarget();
+
+    if (m_UseFreeControls)
+    {
+      newCameraPosition -= cameraTarget * speed;
+    }
+    else
+    {
+      glm::vec4 normalizedTarget = glm::vec4(cameraTarget.x, 0.0f, cameraTarget.z, 0.0f);
+      normalizedTarget = normalizedTarget / Matrices::Norm(normalizedTarget);
+
+      newCameraPosition -= normalizedTarget * speed;
+    }
   }
 
   if (Input::IsKeyPressed(GLFW_KEY_A))
@@ -97,7 +121,7 @@ void Character::Update(Camera *camera, World *world)
   glm::vec3 pos;
   glm::vec3 dir;
 
-  if (ray.RayCast(camera->GetPosition(), camera->GetTarget(), world, World::RayCastCallback, &pos, &dir))
+  if (ray.RayCast(newCameraPosition, camera->GetTarget(), world, World::RayCastCallback, &pos, &dir))
   {
     if (m_ShouldPickBlock)
     {
@@ -122,6 +146,46 @@ void Character::Update(Camera *camera, World *world)
   m_ShouldBreakBlock = false;
   m_ShouldPlaceBlock = false;
   m_ShouldPickBlock = false;
+
+  // Falling physics using raycast
+  Ray fallingRay(CHARACTER_HEIGHT);
+
+  glm::vec3 fallingPos;
+  glm::vec3 fallingDir;
+
+  // FIXME: infinite loop when either x or z are 0.0f
+  glm::vec4 fallingDirection = glm::vec4(0.0001f, -1.0f, 0.0001f, 0.0f);
+
+  if (!m_UseFreeControls)
+  {
+    if (!fallingRay.RayCast(newCameraPosition, fallingDirection, world, World::RayCastCallback, &fallingPos, &fallingDir))
+    {
+      if (m_IsOnGround)
+      {
+        m_IsOnGround = false;
+        m_FallingTime = 0.0f;
+      }
+      else
+      {
+        m_FallingTime += Window::GetDeltaTime();
+      }
+
+      float fallingSpeed = GRAVITY * m_FallingTime;
+
+      if (fallingSpeed > TERMINAL_FALLING_SPEED)
+        fallingSpeed = TERMINAL_FALLING_SPEED;
+
+      camera->UpdatePosition(newCameraPosition + glm::vec4(0.0f, -fallingSpeed * Window::GetDeltaTime(), 0.0f, 0.0f));
+    }
+    else
+    {
+      if (!m_IsOnGround)
+      {
+        m_IsOnGround = true;
+        m_FallingTime = 0.0f;
+      }
+    }
+  }
 }
 
 void Character::OnClick(int button, int action, int mods)
@@ -146,6 +210,15 @@ void Character::OnClick(int button, int action, int mods)
 
 void Character::OnKeypress(int key, int scancode, int action, int mods)
 {
+  if (key == GLFW_KEY_F && action == GLFW_PRESS)
+  {
+    UseFreeControls();
+  }
+  else if (key == GLFW_KEY_G && action == GLFW_PRESS)
+  {
+    UseNormalControls();
+  }
+
   if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9 && action == GLFW_PRESS)
   {
     m_HotbarPosition = key - GLFW_KEY_1;
