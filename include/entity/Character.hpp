@@ -39,7 +39,7 @@ private:
   float m_FallingTime = 0.0f;
   bool m_IsOnGround = false;
 
-  bool m_UseFreeControls = false;
+  bool m_UseFreeControls = true;
 
   std::array<int, HOTBAR_SIZE> m_Hotbar = {};
   int m_HotbarPosition = 0;
