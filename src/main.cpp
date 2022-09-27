@@ -20,6 +20,10 @@
 
 #include <stb_image/stb_image.h>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+
+#include <tiny_obj_loader/tiny_obj_loader.h>
+
 #include "core/utils.hpp"
 #include "core/Matrices.hpp"
 
@@ -38,12 +42,13 @@
 
 #include "world/BlockDatabase.hpp"
 #include "world/World.hpp"
+#include "world/Object.hpp"
 
 #include "entity/Character.hpp"
 
 int main()
 {
-  if (!Window::Init())
+  if (!Window::Init(false))
   {
     fprintf(stderr, "ERROR: Window initialization failed.\n");
     std::exit(EXIT_FAILURE);
@@ -59,6 +64,7 @@ int main()
 
     Shader worldShader("extras/shaders/World.shader");
     Shader interfaceShader("extras/shaders/Interface.shader");
+    Shader objectShader("extras/shaders/Object.shader");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -77,6 +83,8 @@ int main()
     Input::RegisterKeyCallback(std::bind(&Character::OnKeypress, &player, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
     Input::RegisterScrollCallback(std::bind(&Character::OnScroll, &player, std::placeholders::_1, std::placeholders::_2));
 
+    Object cow("extras/models/cow.obj", 0.0f, 0.0f);
+
     while (!Window::GetShouldClose())
     {
       Window::Tick();
@@ -85,7 +93,7 @@ int main()
 
       float fps = Window::GetFPS();
 
-      printf("FPS: %f \n", fps);
+      // printf("FPS: %f \n", fps);
 
       if (Input::IsKeyPressed(GLFW_KEY_O))
       {
@@ -110,6 +118,8 @@ int main()
       player.Update(&camera, &world);
 
       world.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
+
+      cow.Draw(&objectShader, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
 
       UserInterface::DrawUI(&interfaceShader, world.GetTextureAtlas(), player.GetHotbarPosition());
 

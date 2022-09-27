@@ -35,6 +35,8 @@
 // Stb libraries
 #include <stb_image/stb_image.h>
 
+#include <tiny_obj_loader/tiny_obj_loader.h>
+
 typedef uint64_t uint64;
 typedef uint32_t uint32;
 typedef uint16_t uint16;
