@@ -131,7 +131,7 @@ void Character::Update(Camera *camera, World *world)
   }
   else
   {
-    if (Collisions::aabbWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.3f), world))
+    if (Collisions::aabbWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.6f), world))
     {
       newCameraPosition = camera->GetPosition();
     }
