@@ -157,9 +157,19 @@ void Character::Update(Camera *camera, World *world)
     }
     else if (m_ShouldPlaceBlock && block != AIR && block != WATER)
     {
-      if (world->GetBlock(pos + dir) == AIR)
+      int currentBlock = world->GetBlock(pos + dir);
+
+      if (currentBlock == AIR || currentBlock == WATER)
       {
         world->SetBlock(pos + dir, block);
+
+        if (!m_UseFreeControls)
+        {
+          if (Collisions::aabbWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.6f), world))
+          {
+            world->SetBlock(pos + dir, currentBlock);
+          }
+        }
       }
     }
   }
