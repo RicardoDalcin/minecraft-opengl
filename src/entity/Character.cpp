@@ -64,7 +64,18 @@ void Character::Update(Camera *camera, World *world)
   camera->UpdateCameraAngles(newTheta, newPhi);
   Input::ResetDeltas();
 
-  float baseSpeed = Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) ? RUN_SPEED : BASE_SPEED;
+  if (Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) && Input::IsKeyPressed(GLFW_KEY_W))
+  {
+    camera->SetFOV(75.0f);
+  }
+  else
+  {
+    camera->SetFOV(70.0f);
+  }
+
+  float baseSpeed = Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL)
+                        ? (m_UseFreeControls ? FLYING_SPEED : RUNNING_SPEED)
+                        : BASE_SPEED;
 
   float speed = baseSpeed * Window::GetDeltaTime();
 
@@ -158,33 +169,72 @@ void Character::Update(Camera *camera, World *world)
 
   if (!m_UseFreeControls)
   {
-    if (!fallingRay.RayCast(newCameraPosition, fallingDirection, world, World::RayCastCallback, &fallingPos, &fallingDir))
+    float verticalSpeed = 0.0f;
+
+    if (Input::IsKeyPressed(GLFW_KEY_SPACE))
     {
-      if (m_IsOnGround)
+      if (m_IsOnGround && !m_IsJumping)
       {
         m_IsOnGround = false;
         m_FallingTime = 0.0f;
+
+        m_IsJumping = true;
+        m_JumpingTime = 0.0f;
+      }
+    }
+
+    if (m_IsJumping)
+    {
+      float distanceJumped = JUMP_INITIAL_SPEED * m_JumpingTime + (JUMP_FORCE * m_JumpingTime * m_JumpingTime) / 2;
+
+      if (distanceJumped >= JUMP_HEIGHT)
+      {
+        m_IsJumping = false;
+        m_JumpingTime = 0.0f;
       }
       else
       {
-        m_FallingTime += Window::GetDeltaTime();
+        m_JumpingTime += Window::GetDeltaTime();
       }
 
-      float fallingSpeed = GRAVITY * m_FallingTime;
+      verticalSpeed = JUMP_INITIAL_SPEED + JUMP_FORCE * m_JumpingTime;
 
-      if (fallingSpeed > TERMINAL_FALLING_SPEED)
-        fallingSpeed = TERMINAL_FALLING_SPEED;
+      if (verticalSpeed < 0.05f)
+        verticalSpeed = 0.05f;
+    }
 
-      camera->UpdatePosition(newCameraPosition + glm::vec4(0.0f, -fallingSpeed * Window::GetDeltaTime(), 0.0f, 0.0f));
+    if (!fallingRay.RayCast(newCameraPosition, fallingDirection, world, World::RayCastCallback, &fallingPos, &fallingDir))
+    {
+      if (!m_IsJumping)
+      {
+        if (m_IsOnGround)
+        {
+          m_IsOnGround = false;
+          m_FallingTime = 0.0f;
+        }
+        else
+        {
+          m_FallingTime += Window::GetDeltaTime();
+        }
+
+        verticalSpeed = GRAVITY * m_FallingTime;
+
+        if (verticalSpeed > TERMINAL_FALLING_SPEED)
+          verticalSpeed = TERMINAL_FALLING_SPEED;
+
+        verticalSpeed *= -1;
+      }
     }
     else
     {
-      if (!m_IsOnGround)
+      if (!m_IsOnGround && !m_IsJumping)
       {
         m_IsOnGround = true;
         m_FallingTime = 0.0f;
       }
     }
+
+    camera->UpdatePosition(newCameraPosition + glm::vec4(0.0f, verticalSpeed * Window::GetDeltaTime(), 0.0f, 0.0f));
   }
 }
 

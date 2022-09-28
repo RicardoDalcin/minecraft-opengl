@@ -22,7 +22,7 @@ private:
 
   const float m_Nearplane;
   const float m_Farplane;
-  const float m_FOV;
+  float m_FOV;
 
   void UpdateCameraVectors()
   {
@@ -56,6 +56,16 @@ public:
 
   glm::mat4 ComputeViewMatrix() const;
   glm::mat4 ComputeProjectionMatrix() const;
+
+  float GetFOV() const
+  {
+    return m_FOV;
+  }
+
+  void SetFOV(float fov)
+  {
+    m_FOV = fov;
+  }
 };
 
 #endif

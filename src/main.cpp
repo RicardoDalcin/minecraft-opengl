@@ -48,7 +48,7 @@
 
 int main()
 {
-  if (!Window::Init(false))
+  if (!Window::Init())
   {
     fprintf(stderr, "ERROR: Window initialization failed.\n");
     std::exit(EXIT_FAILURE);
@@ -59,7 +59,7 @@ int main()
 
     Renderer renderer;
 
-    Camera camera(-0.1f, -1024.0f, 3.141592 / 3.0f);
+    Camera camera(-0.1f, -1024.0f, 60.0f);
     Character player(glm::vec4(0.0f, 64.0f, -3.0f, 1.0f));
 
     Shader worldShader("extras/shaders/World.shader");

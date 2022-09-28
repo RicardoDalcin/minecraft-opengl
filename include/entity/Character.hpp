@@ -21,13 +21,16 @@ class Character
 {
 private:
   const float BREAK_COOLDOWN = 0.2f;
-  const float BASE_SPEED = 5.0f;
-  const float RUN_SPEED = 100.0f;
+  const float BASE_SPEED = 4.3f;
+  const float RUNNING_SPEED = 6.5f;
+  const float FLYING_SPEED = 100.0f;
 
   const float GRAVITY = 28.0f;
   const float TERMINAL_FALLING_SPEED = 60.0f;
 
-  const float JUMP_COOLDOWN = 0.2f;
+  const float JUMP_FORCE = -12.0f;
+  const float JUMP_INITIAL_SPEED = 8.0f;
+  const float JUMP_HEIGHT = 1.25f;
   const float CHARACTER_HEIGHT = 1.8f;
 
   glm::vec4 m_Position;
@@ -38,6 +41,9 @@ private:
 
   float m_FallingTime = 0.0f;
   bool m_IsOnGround = false;
+
+  bool m_IsJumping = false;
+  float m_JumpingTime = 0.0f;
 
   bool m_UseFreeControls = true;
 

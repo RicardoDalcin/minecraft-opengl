@@ -4,7 +4,7 @@
 
 float g_Ratio = 16.0f / 9.0f;
 
-Camera::Camera(float nearplane = -0.1f, float farplane = -620.0f, float fieldOfView = 3.141592 / 3.0f)
+Camera::Camera(float nearplane = -0.1f, float farplane = -620.0f, float fieldOfView = 60.0f)
     : m_Nearplane(nearplane),
       m_Farplane(farplane),
       m_FOV(fieldOfView)
@@ -69,7 +69,7 @@ glm::mat4 Camera::ComputeProjectionMatrix() const
 {
   if (m_UsePerspective)
   {
-    return Matrices::MatrixPerspective(m_FOV, g_Ratio, m_Nearplane, m_Farplane);
+    return Matrices::MatrixPerspective(m_FOV * 3.141592f / 180.0f, g_Ratio, m_Nearplane, m_Farplane);
   }
 
   float t = 1.5f * m_CameraDistance / 2.5f;
