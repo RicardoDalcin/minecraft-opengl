@@ -13,6 +13,7 @@
 
 #include "world/World.hpp"
 
+#include "physics/collisions.hpp"
 #include "physics/Ray.hpp"
 
 const int HOTBAR_SIZE = 9;
@@ -28,7 +29,7 @@ private:
   const float GRAVITY = 28.0f;
   const float TERMINAL_FALLING_SPEED = 60.0f;
 
-  const float JUMP_FORCE = -12.0f;
+  const float JUMP_FORCE = -22.0f;
   const float JUMP_INITIAL_SPEED = 8.0f;
   const float JUMP_HEIGHT = 1.25f;
   const float CHARACTER_HEIGHT = 1.8f;

@@ -125,7 +125,17 @@ void Character::Update(Camera *camera, World *world)
     newCameraPosition += camera->GetRight() * speed;
   }
 
-  camera->UpdatePosition(newCameraPosition);
+  if (m_UseFreeControls)
+  {
+    camera->UpdatePosition(newCameraPosition);
+  }
+  else
+  {
+    if (Collisions::aabbWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.3f), world))
+    {
+      newCameraPosition = camera->GetPosition();
+    }
+  }
 
   Ray ray(5.5f);
 

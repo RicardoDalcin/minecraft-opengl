@@ -208,3 +208,13 @@ int World::GetBlock(glm::vec3 position)
 
   return chunk->GetCube(glm::vec3(blockX, blockY, blockZ));
 }
+
+Chunk *World::GetChunk(int chunkX, int chunkZ)
+{
+  if (chunkX < 0 || chunkX >= WorldConstants::CHUNKS_PER_AXIS || chunkZ < 0 || chunkZ >= WorldConstants::CHUNKS_PER_AXIS)
+  {
+    return nullptr;
+  }
+
+  return m_Chunks[chunkX][chunkZ];
+}

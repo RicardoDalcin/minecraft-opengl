@@ -48,6 +48,8 @@ public:
   void SetBlock(glm::vec3 position, int block);
   int GetBlock(glm::vec3 position);
 
+  Chunk *GetChunk(int x, int z);
+
   Texture *GetTextureAtlas() { return m_TextureAtlas; }
 };
 
