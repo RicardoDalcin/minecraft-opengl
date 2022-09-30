@@ -93,7 +93,7 @@ int main()
 
       float fps = Window::GetFPS();
 
-      // printf("FPS: %f \n", fps);
+      printf("FPS: %f \n", fps);
 
       if (Input::IsKeyPressed(GLFW_KEY_O))
       {

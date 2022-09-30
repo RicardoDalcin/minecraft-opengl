@@ -14,7 +14,6 @@
 #include "world/World.hpp"
 
 #include "physics/collisions.hpp"
-#include "physics/Ray.hpp"
 
 const int HOTBAR_SIZE = 9;
 

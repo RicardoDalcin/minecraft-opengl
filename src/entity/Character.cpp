@@ -131,18 +131,16 @@ void Character::Update(Camera *camera, World *world)
   }
   else
   {
-    if (Collisions::aabbWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.6f), world))
+    if (Collisions::BoundingBoxWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.6f), world))
     {
       newCameraPosition = camera->GetPosition();
     }
   }
 
-  Ray ray(5.5f);
-
   glm::vec3 pos;
   glm::vec3 dir;
 
-  if (ray.RayCast(newCameraPosition, camera->GetTarget(), world, World::RayCastCallback, &pos, &dir))
+  if (Collisions::RayCast(5.5f, newCameraPosition, camera->GetTarget(), world, World::RayCastCallback, &pos, &dir))
   {
     if (m_ShouldPickBlock)
     {
@@ -165,7 +163,7 @@ void Character::Update(Camera *camera, World *world)
 
         if (!m_UseFreeControls)
         {
-          if (Collisions::aabbWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.6f), world))
+          if (Collisions::BoundingBoxWorldCollision(newCameraPosition, glm::vec3(0.6f, 1.8f, 0.6f), world))
           {
             world->SetBlock(pos + dir, currentBlock);
           }
@@ -177,9 +175,6 @@ void Character::Update(Camera *camera, World *world)
   m_ShouldBreakBlock = false;
   m_ShouldPlaceBlock = false;
   m_ShouldPickBlock = false;
-
-  // Falling physics using raycast
-  Ray fallingRay(CHARACTER_HEIGHT);
 
   glm::vec3 fallingPos;
   glm::vec3 fallingDir;
@@ -223,7 +218,7 @@ void Character::Update(Camera *camera, World *world)
         verticalSpeed = 0.05f;
     }
 
-    if (!fallingRay.RayCast(newCameraPosition, fallingDirection, world, World::RayCastCallback, &fallingPos, &fallingDir))
+    if (!Collisions::RayCast(CHARACTER_HEIGHT, newCameraPosition, fallingDirection, world, World::RayCastCallback, &fallingPos, &fallingDir))
     {
       if (!m_IsJumping)
       {
