@@ -11,6 +11,8 @@ obj
 *.o
 *.obj
 
+!/extras/models/*.obj
+
 # Precompiled Headers
 *.gch
 *.pch
