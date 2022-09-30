@@ -5,6 +5,7 @@
 Character::Character()
     : m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
 {
+  m_JumpCurve = new Bezier(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, JUMP_HEIGHT / 2), glm::vec2(0.0f, JUMP_HEIGHT), glm::vec2(1.0f, JUMP_HEIGHT));
 }
 
 Character::Character(glm::vec4 position)
@@ -14,6 +15,8 @@ Character::Character(glm::vec4 position)
   {
     SetHotbarItem(i, i + 1);
   }
+
+  m_JumpCurve = new Bezier(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, JUMP_HEIGHT / 2), glm::vec2(0.0f, JUMP_HEIGHT), glm::vec2(1.0f, JUMP_HEIGHT));
 }
 
 Character::~Character()
@@ -200,22 +203,19 @@ void Character::Update(Camera *camera, World *world)
 
     if (m_IsJumping)
     {
-      float distanceJumped = JUMP_INITIAL_SPEED * m_JumpingTime + (JUMP_FORCE * m_JumpingTime * m_JumpingTime) / 2;
+      float distanceJumped = m_JumpCurve->GetPoint(m_JumpingTime / JUMP_TIME).y;
 
-      if (distanceJumped >= JUMP_HEIGHT)
+      m_JumpingTime += Window::GetDeltaTime();
+
+      if (m_JumpingTime >= JUMP_TIME)
       {
         m_IsJumping = false;
         m_JumpingTime = 0.0f;
       }
-      else
-      {
-        m_JumpingTime += Window::GetDeltaTime();
-      }
 
-      verticalSpeed = JUMP_INITIAL_SPEED + JUMP_FORCE * m_JumpingTime;
+      float currentJumpDistance = m_JumpCurve->GetPoint(m_JumpingTime / JUMP_TIME).y;
 
-      if (verticalSpeed < 0.05f)
-        verticalSpeed = 0.05f;
+      verticalSpeed = (currentJumpDistance - distanceJumped) / Window::GetDeltaTime();
 
       glm::vec4 position = newCameraPosition + glm::vec4(0.0f, verticalSpeed * Window::GetDeltaTime() + 0.1f, 0.0f, 0.0f);
 
