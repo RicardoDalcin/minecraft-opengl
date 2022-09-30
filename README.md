@@ -18,7 +18,5 @@
 - [ ] Iluminação com modelo de Gouraud
 - [ ] Iluminação com modelo de Phong
 - [x] Mapeamento de texturas
-- [ ] Curvas de bézier
-  - Ideia: aceleração do pulo
-  - Ideia 2: trajetória da flecha
+- [x] Curvas de bézier
 - [x] Animação de movimento baseada no tempo
