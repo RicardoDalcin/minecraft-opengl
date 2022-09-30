@@ -59,12 +59,13 @@ int main()
 
     Renderer renderer;
 
-    Camera camera(-0.1f, -1024.0f, 60.0f);
-    Character player(glm::vec4(0.0f, 64.0f, -3.0f, 1.0f));
-
     Shader worldShader("extras/shaders/World.shader");
     Shader interfaceShader("extras/shaders/Interface.shader");
     Shader objectShader("extras/shaders/Object.shader");
+    Shader basicShader("extras/shaders/Basic.shader");
+
+    Camera camera(-0.1f, -1024.0f, 60.0f);
+    Character player(&basicShader, glm::vec4(0.0f, 64.0f, -3.0f, 1.0f));
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -118,6 +119,8 @@ int main()
       player.Update(&camera, &world);
 
       world.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
+
+      player.Draw(camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
 
       cow.Draw(&objectShader, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
 

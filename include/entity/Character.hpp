@@ -34,6 +34,12 @@ private:
 
   const float CHARACTER_HEIGHT = 1.8f;
 
+  Shader *m_Shader;
+
+  VertexArray *m_VAO;
+  VertexBuffer *m_VBO;
+  IndexBuffer *m_IB;
+
   Bezier *m_JumpCurve = NULL;
 
   glm::vec4 m_Position;
@@ -54,8 +60,7 @@ private:
   int m_HotbarPosition = 0;
 
 public:
-  Character();
-  Character(glm::vec4 position);
+  Character(Shader *shader, glm::vec4 position);
   ~Character();
 
   void SetPosition(glm::vec4 position);
@@ -75,6 +80,8 @@ public:
   std::array<int, HOTBAR_SIZE> GetHotbar() const { return m_Hotbar; }
 
   void Update(Camera *camera, World *world);
+
+  void Draw(glm::mat4 view, glm::mat4 projection);
 
   void OnClick(int button, int action, int mods);
   void OnKeypress(int key, int scancode, int action, int mods);

@@ -2,14 +2,9 @@
 
 #include <cstdio>
 
-Character::Character()
-    : m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f))
-{
-  m_JumpCurve = new Bezier(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, JUMP_HEIGHT / 2), glm::vec2(0.0f, JUMP_HEIGHT), glm::vec2(1.0f, JUMP_HEIGHT));
-}
-
-Character::Character(glm::vec4 position)
-    : m_Position(position)
+Character::Character(Shader *shader, glm::vec4 position)
+    : m_Position(position),
+      m_Shader(shader)
 {
   for (int i = 0; i < HOTBAR_SIZE; i++)
   {
@@ -17,6 +12,52 @@ Character::Character(glm::vec4 position)
   }
 
   m_JumpCurve = new Bezier(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, JUMP_HEIGHT / 2), glm::vec2(0.0f, JUMP_HEIGHT), glm::vec2(1.0f, JUMP_HEIGHT));
+
+  float minX = -0.3f;
+  float maxX = 0.3f;
+
+  float minY = 0.0f;
+  float maxY = 1.8f;
+
+  float minZ = -0.3f;
+  float maxZ = 0.3f;
+
+  float vertices[] = {
+      minX, maxY, maxZ, 1.0f, // 0
+      minX, minY, maxZ, 1.0f, // 1
+      maxX, minY, maxZ, 1.0f, // 2
+      maxX, maxY, maxZ, 1.0f, // 3
+
+      minX, maxY, minZ, 1.0f, // 4
+      minX, minY, minZ, 1.0f, // 5
+      maxX, minY, minZ, 1.0f, // 6
+      maxX, maxY, minZ, 1.0f, // 7
+  };
+
+  m_VAO = new VertexArray();
+
+  m_VBO = new VertexBuffer(vertices, 8 * 4 * sizeof(float));
+
+  std::array<unsigned int, 3 * 2 * 6> indices = {
+      0, 1, 2, // triângulo 1
+      7, 6, 5, // triângulo 2
+      3, 2, 6, // triângulo 3
+      4, 0, 3, // triângulo 4
+      4, 5, 1, // triângulo 5
+      1, 5, 6, // triângulo 6
+      0, 2, 3, // triângulo 7
+      7, 5, 4, // triângulo 8
+      3, 6, 7, // triângulo 9
+      4, 3, 7, // triângulo 10
+      4, 1, 0, // triângulo 11
+      1, 6, 2, // triângulo 12
+  };
+
+  VertexBufferLayout layout;
+  layout.Push(LayoutType::LT_FLOAT, 4);
+  m_VAO->AddBuffer(*m_VBO, layout);
+
+  m_IB = new IndexBuffer(indices.data(), indices.size());
 }
 
 Character::~Character()
@@ -259,6 +300,23 @@ void Character::Update(Camera *camera, World *world)
 
     camera->UpdatePosition(newCameraPosition + glm::vec4(0.0f, verticalSpeed * Window::GetDeltaTime(), 0.0f, 0.0f));
   }
+}
+
+void Character::Draw(glm::mat4 view, glm::mat4 projection)
+{
+  m_Shader->Bind();
+
+  m_Shader->SetUniformMat4f("uView", view);
+  m_Shader->SetUniformMat4f("uProjection", projection);
+
+  glm::mat4 model = Matrices::MatrixTranslate(0.0f, 30.0f, 0.0f);
+
+  m_Shader->SetUniformMat4f("uTransform", model);
+
+  m_VAO->Bind();
+  m_IB->Bind();
+
+  glDrawElements(GL_TRIANGLES, m_IB->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void Character::OnClick(int button, int action, int mods)
