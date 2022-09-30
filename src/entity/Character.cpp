@@ -216,6 +216,14 @@ void Character::Update(Camera *camera, World *world)
 
       if (verticalSpeed < 0.05f)
         verticalSpeed = 0.05f;
+
+      glm::vec4 position = newCameraPosition + glm::vec4(0.0f, verticalSpeed * Window::GetDeltaTime() + 0.1f, 0.0f, 0.0f);
+
+      if (Collisions::PointWorldCollision(position, world))
+      {
+        m_IsJumping = false;
+        m_JumpingTime = 0.0f;
+      }
     }
 
     if (!Collisions::RayCast(CHARACTER_HEIGHT, newCameraPosition, fallingDirection, world, World::RayCastCallback, &fallingPos, &fallingDir))

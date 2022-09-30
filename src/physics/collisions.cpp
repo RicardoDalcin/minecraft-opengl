@@ -71,6 +71,36 @@ namespace Collisions
     return false;
   }
 
+  bool PointWorldCollision(glm::vec3 point, World *world)
+  {
+    int playerChunkX = (int)floorf(point.x / WorldConstants::CHUNK_SIZE);
+    int playerChunkZ = (int)floorf(point.z / WorldConstants::CHUNK_SIZE);
+
+    if (playerChunkX >= 0 && playerChunkX < WorldConstants::CHUNKS_PER_AXIS && playerChunkZ >= 0 && playerChunkZ < WorldConstants::CHUNKS_PER_AXIS)
+    {
+      Chunk *chunk = world->GetChunk(playerChunkX, playerChunkZ);
+
+      int playerBlockX = ((int)floorf(point.x)) % WorldConstants::CHUNK_SIZE;
+      int playerBlockZ = ((int)floorf(point.z)) % WorldConstants::CHUNK_SIZE;
+
+      int playerBlockY = (int)floorf(point.y);
+
+      if (playerBlockX >= 0 && playerBlockX < WorldConstants::CHUNK_SIZE && playerBlockZ >= 0 && playerBlockZ < WorldConstants::CHUNK_SIZE)
+      {
+        int block = chunk->GetCube(glm::vec3(playerBlockX, playerBlockY, playerBlockZ));
+
+        BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(block);
+
+        if (blockInfo.isSolid)
+        {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   bool RayCast(float length, glm::vec4 origin, glm::vec4 direction, World *data, bool (*callback)(World *, glm::vec4), glm::vec3 *out, glm::vec3 *directionOut)
   {
 

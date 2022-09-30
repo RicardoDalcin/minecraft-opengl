@@ -13,7 +13,7 @@
 - [x] Free camera
 - [ ] Look-at camera
 - [ ] Objeto virtual copiado em duas ou mais instâncias
-- [ ] Três tipos de testes de intersecção em collisions.cpp
+- [x] Três tipos de testes de intersecção em collisions.cpp
 - [ ] Iluminação difusa (Lambert) e Blinn-Phong
 - [ ] Iluminação com modelo de Gouraud
 - [ ] Iluminação com modelo de Phong
