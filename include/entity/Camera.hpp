@@ -13,6 +13,7 @@ private:
   float m_CameraDistance = 160.0f;     // Distância da câmera para a origem
 
   bool m_UsePerspective = true;
+  bool m_UseFreeCamera = true;
 
   glm::vec4 m_CameraCenter = glm::vec4(0.0f, 64.0f, -3.0f, 1.0f);
   glm::vec4 m_CameraFront;
@@ -47,6 +48,9 @@ public:
   void UsePerspective();
   void UseOrthographic();
 
+  void UseFreeCamera();
+  void UseLookAtCamera();
+
   float GetCameraTheta() const;
   float GetCameraPhi() const;
 
@@ -65,6 +69,11 @@ public:
   void SetFOV(float fov)
   {
     m_FOV = fov;
+  }
+
+  bool IsFreeCamera() const
+  {
+    return m_UseFreeCamera;
   }
 };
 

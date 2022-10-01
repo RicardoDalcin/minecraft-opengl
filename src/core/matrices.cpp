@@ -220,12 +220,37 @@ namespace Matrices
   // Matriz de mudança de coordenadas para o sistema de coordenadas da Câmera.
   glm::mat4 MatrixCameraView(glm::vec4 position_c, glm::vec4 view_vector, glm::vec4 up_vector)
   {
-    glm::vec4 w = -view_vector / Norm(view_vector);
-    glm::vec4 u = (CrossProduct(up_vector, w)) / Norm(CrossProduct(up_vector, w));
+    float viewVectorNorm = Norm(view_vector);
+
+    glm::vec4 w = -view_vector;
+
+    if (viewVectorNorm < 0.00001f)
+      w /= 0.00001f;
+    else
+      w /= viewVectorNorm;
+
+    float norm = Norm(CrossProduct(up_vector, w));
+
+    glm::vec4 u = (CrossProduct(up_vector, w));
+
+    if (norm < 0.00001f)
+      u /= 0.00001f;
+    else
+      u /= norm;
+
+    float wNorm = Norm(w);
+    float uNorm = Norm(u);
 
     // Normalizamos os vetores u e w
-    w = w / Norm(w);
-    u = u / Norm(u);
+    if (wNorm < 0.00001f)
+      w /= 0.00001f;
+    else
+      w /= wNorm;
+
+    if (uNorm < 0.00001f)
+      u /= 0.00001f;
+    else
+      u /= uNorm;
 
     glm::vec4 v = CrossProduct(w, u);
 

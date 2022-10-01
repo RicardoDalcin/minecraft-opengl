@@ -81,7 +81,7 @@ public:
 
   void Update(Camera *camera, World *world);
 
-  void Draw(glm::mat4 view, glm::mat4 projection);
+  void Draw(Camera *camera, glm::mat4 view, glm::mat4 projection);
 
   void OnClick(int button, int action, int mods);
   void OnKeypress(int key, int scancode, int action, int mods);

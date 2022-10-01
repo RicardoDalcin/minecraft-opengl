@@ -116,11 +116,24 @@ int main()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
 
+      if (Input::IsKeyPressed(GLFW_KEY_H))
+      {
+        camera.UseFreeCamera();
+      }
+
+      if (Input::IsKeyPressed(GLFW_KEY_J))
+      {
+        camera.UseLookAtCamera();
+      }
+
       player.Update(&camera, &world);
 
       world.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
 
-      player.Draw(camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
+      if (!camera.IsFreeCamera())
+      {
+        player.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
+      }
 
       cow.Draw(&objectShader, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
 

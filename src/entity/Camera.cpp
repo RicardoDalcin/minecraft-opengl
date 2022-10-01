@@ -35,6 +35,16 @@ void Camera::UseOrthographic()
   m_UsePerspective = false;
 }
 
+void Camera::UseFreeCamera()
+{
+  m_UseFreeCamera = true;
+}
+
+void Camera::UseLookAtCamera()
+{
+  m_UseFreeCamera = false;
+}
+
 float Camera::GetCameraTheta() const
 {
   return m_CameraTheta;
@@ -62,7 +72,21 @@ glm::vec4 Camera::GetRight() const
 
 glm::mat4 Camera::ComputeViewMatrix() const
 {
-  return Matrices::MatrixCameraView(m_CameraCenter, m_CameraFront, m_CameraUp);
+  if (m_UseFreeCamera)
+  {
+    return Matrices::MatrixCameraView(m_CameraCenter, m_CameraFront, m_CameraUp);
+  }
+
+  float r = 2.5f;
+  float y = r * sin(m_CameraPhi);
+  float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
+  float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
+
+  glm::vec4 cameraPosition = glm::vec4(m_CameraCenter.x - x, m_CameraCenter.y - y, m_CameraCenter.z - z, 1.0f);
+  glm::vec4 lookAtPosition = glm::vec4(m_CameraCenter.x, m_CameraCenter.y, m_CameraCenter.z, 1.0f);
+  glm::vec4 viewVector = lookAtPosition - cameraPosition;
+
+  return Matrices::MatrixCameraView(cameraPosition, viewVector, m_CameraUp);
 }
 
 glm::mat4 Camera::ComputeProjectionMatrix() const

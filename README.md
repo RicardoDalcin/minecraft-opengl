@@ -7,11 +7,9 @@
 - [x] Utilizar matrizes model, view e projection
 - [x] Interação com mouse e teclado
 - [x] Carregar e exibir arquivo .obj
-- [ ] Transformações geométricas de objetos virtuais
-  - Ideia: botão que posiciona o .obj em diferentes lugares
-  - Ideia 2: botão que rotaciona o .obj
+- [x] Transformações geométricas de objetos virtuais
 - [x] Free camera
-- [ ] Look-at camera
+- [x] Look-at camera
 - [ ] Objeto virtual copiado em duas ou mais instâncias
 - [x] Três tipos de testes de intersecção em collisions.cpp
 - [ ] Iluminação difusa (Lambert) e Blinn-Phong

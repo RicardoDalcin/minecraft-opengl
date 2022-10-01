@@ -302,14 +302,14 @@ void Character::Update(Camera *camera, World *world)
   }
 }
 
-void Character::Draw(glm::mat4 view, glm::mat4 projection)
+void Character::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
 {
   m_Shader->Bind();
 
   m_Shader->SetUniformMat4f("uView", view);
   m_Shader->SetUniformMat4f("uProjection", projection);
 
-  glm::mat4 model = Matrices::MatrixTranslate(0.0f, 30.0f, 0.0f);
+  glm::mat4 model = Matrices::MatrixTranslate(camera->GetPosition().x, camera->GetPosition().y - CHARACTER_HEIGHT, camera->GetPosition().z);
 
   m_Shader->SetUniformMat4f("uTransform", model);
 
