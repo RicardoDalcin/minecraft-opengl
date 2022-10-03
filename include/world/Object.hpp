@@ -19,11 +19,6 @@ private:
   float m_ObjectX;
   float m_ObjectZ;
 
-  // VertexArray *m_VAO;
-  // VertexBuffer *m_VBO;
-
-  // int m_MeshVertexCount;
-
   GLuint m_VertexArrayObjectId;
   GLuint m_VertexBufferObjectId;
   int m_IndexCount;

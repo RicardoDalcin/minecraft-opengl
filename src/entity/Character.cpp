@@ -3,8 +3,8 @@
 #include <cstdio>
 
 Character::Character(Shader *shader, glm::vec4 position)
-    : m_Position(position),
-      m_Shader(shader)
+    : m_Shader(shader),
+      m_Position(position)
 {
   for (int i = 0; i < HOTBAR_SIZE; i++)
   {
