@@ -222,16 +222,18 @@ void Object::BuildVertices()
   glBindVertexArray(0);
 }
 
-void Object::Draw(Shader *shader, glm::mat4 view, glm::mat4 projection)
+void Object::Draw(Shader *shader, glm::mat4 view, glm::mat4 projection, bool isGouraud)
 {
   shader->Bind();
 
-  shader->SetUniformMat4f("view", view);
-  shader->SetUniformMat4f("projection", projection);
+  shader->SetUniformMat4f("uView", view);
+  shader->SetUniformMat4f("uProjection", projection);
 
   glm::mat4 model = Matrices::MatrixTranslate(m_ObjectX, 30.0f, m_ObjectZ);
 
-  shader->SetUniformMat4f("model", model);
+  shader->SetUniformMat4f("uModel", model);
+
+  shader->SetUniform1i("uIsGouraud", isGouraud ? 1 : 0);
 
   glBindVertexArray(m_VertexArrayObjectId);
 

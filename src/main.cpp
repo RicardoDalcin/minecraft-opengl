@@ -86,6 +86,8 @@ int main()
 
     Object cow("extras/models/cow.obj", 0.0f, 0.0f);
 
+    bool isGouraud = false;
+
     while (!Window::GetShouldClose())
     {
       Window::Tick();
@@ -126,6 +128,16 @@ int main()
         camera.UseLookAtCamera();
       }
 
+      if (Input::IsKeyPressed(GLFW_KEY_K))
+      {
+        isGouraud = true;
+      }
+
+      if (Input::IsKeyPressed(GLFW_KEY_L))
+      {
+        isGouraud = false;
+      }
+
       player.Update(&camera, &world);
 
       world.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
@@ -135,7 +147,7 @@ int main()
         player.Draw(&camera, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
       }
 
-      cow.Draw(&objectShader, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix());
+      cow.Draw(&objectShader, camera.ComputeViewMatrix(), camera.ComputeProjectionMatrix(), isGouraud);
 
       UserInterface::DrawUI(&interfaceShader, world.GetTextureAtlas(), player.GetHotbarPosition());
 

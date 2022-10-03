@@ -43,7 +43,7 @@ public:
   void ComputeNormals();
   void BuildVertices();
 
-  void Draw(Shader *shader, glm::mat4 view, glm::mat4 projection);
+  void Draw(Shader *shader, glm::mat4 view, glm::mat4 projection, bool isGouraud);
 };
 
 #endif
