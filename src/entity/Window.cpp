@@ -13,6 +13,7 @@ int Window::height = 0.0f;
 
 GLFWwindow *Window::window = nullptr;
 
+// Inicializa a janela e instala os callbacks
 bool Window::Init(bool fullscreen)
 {
   if (!glfwInit())
@@ -87,6 +88,7 @@ bool Window::Init(bool fullscreen)
   return true;
 }
 
+// Faz poll dos eventos e atualiza o delta time
 void Window::Tick()
 {
   glfwPollEvents();

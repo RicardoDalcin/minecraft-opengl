@@ -23,6 +23,7 @@ const float UserInterface::hotbarIconHeight = 32.0f;
 std::array<float, 5 * 4 *UI_HOTBAR_SIZE> UserInterface::hotbarVertices = {};
 std::array<unsigned int, 6 *UI_HOTBAR_SIZE> UserInterface::hotbarIndices = {};
 
+// Atualiza a textura do ícone na posição da hotbar
 void UserInterface::UpdateHotbarPosition(int position, std::array<glm::vec2, 4> textureCoords)
 {
   if (position >= UI_HOTBAR_SIZE)
@@ -59,6 +60,7 @@ void UserInterface::UpdateHotbarPosition(int position, std::array<glm::vec2, 4> 
   hotbarIndices[position * 6 + 5] = 0 + position * 4;
 }
 
+// Desenha um elemento de UI na tela
 void UserInterface::DrawUIElement(Shader *shader, std::string texturePath, int elementWidth, int elementHeight, float centerX, float centerY)
 {
   int width = Window::GetWidth();
@@ -95,6 +97,7 @@ void UserInterface::DrawUIElement(Shader *shader, std::string texturePath, int e
   renderer.Draw(va, ib, shader);
 }
 
+// Desenha os ícones da hotbar
 void UserInterface::DrawHotbarIcons(Shader *shader)
 {
   shader->SetUniform1i("uTexture", 0);
@@ -113,6 +116,7 @@ void UserInterface::DrawHotbarIcons(Shader *shader)
   renderer.Draw(va, ib, shader);
 }
 
+// Desenha os elementos de UI da aplicação
 void UserInterface::DrawUI(Shader *shader, Texture *atlas, int hotbarPosition)
 {
   GLint polygonMode;

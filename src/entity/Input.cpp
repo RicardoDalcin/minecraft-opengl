@@ -24,29 +24,37 @@ std::vector<KeyCallbackType> Input::keyCallbacks = {};
 std::vector<MouseButtonCallbackType> Input::mouseButtonCallbacks = {};
 std::vector<ScrollCallbackType> Input::scrollCallbacks = {};
 
+// Gerencia o key callback do GLFW
 void Input::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
 
+  // Atualiza o estado da tecla
   if (key >= 0 && key < GLFW_KEY_LAST)
     Input::pressedKeys[key] = action != GLFW_RELEASE;
 
+  // Executa os callbacks
   for (auto &callback : keyCallbacks)
     callback(key, scancode, action, mods);
 }
 
+// Gerencia o mouse button callback do GLFW
 void Input::MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
+  // Atualiza o estado do botão
   if (button >= 0 && button < GLFW_MOUSE_BUTTON_LAST)
     Input::pressedMouseButtons[button] = action != GLFW_RELEASE;
 
+  // Executa os callbacks
   for (auto &callback : mouseButtonCallbacks)
     callback(button, action, mods);
 }
 
+// Gerencia o scroll callback do GLFW
 void Input::ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
+  // Executa os callbacks
   for (auto &callback : scrollCallbacks)
     callback(xoffset, yoffset);
 }
@@ -56,6 +64,7 @@ void Input::ResetDeltas()
   Input::deltaMousePosition = glm::vec2(0.0f, 0.0f);
 }
 
+// Gerencia o cursor position callback do GLFW
 void Input::CursorPositionCallback(GLFWwindow *window, double xpos, double ypos)
 {
   mousePosition.x = (float)xpos;
@@ -67,7 +76,7 @@ void Input::CursorPositionCallback(GLFWwindow *window, double xpos, double ypos)
     initialized = true;
   }
 
-  // Accumulate delta in case of multiple polls per frame
+  // Acumula o delta caso tiver múltiplos polls por frame
   deltaMousePosition = mousePosition - lastMousePosition;
   lastMousePosition = mousePosition;
 }
