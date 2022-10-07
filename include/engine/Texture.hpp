@@ -3,6 +3,7 @@
 
 #include "Renderer.hpp"
 
+// Classe para load e uso de texturas
 class Texture
 {
 private:

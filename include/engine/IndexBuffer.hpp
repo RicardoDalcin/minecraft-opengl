@@ -1,6 +1,7 @@
 #ifndef _INDEXBUFFER_H
 #define _INDEXBUFFER_H
 
+// Classe para gerenciamento de index buffer
 class IndexBuffer
 {
 private:

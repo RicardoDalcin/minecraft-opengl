@@ -4,6 +4,7 @@
 
 #include "engine/Renderer.hpp"
 
+// Classe para gerenciamento de vertex buffer
 VertexBuffer::VertexBuffer(const void *data, unsigned int size)
 {
   glGenBuffers(1, &m_RendererId);

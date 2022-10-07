@@ -4,6 +4,7 @@
 
 float g_Ratio = 16.0f / 9.0f;
 
+// Classe para gerenciamento de câmera da aplicação
 Camera::Camera(float nearplane = -0.1f, float farplane = -620.0f, float fieldOfView = 60.0f)
     : m_Nearplane(nearplane),
       m_Farplane(farplane),
@@ -22,6 +23,7 @@ void Camera::UpdateCameraAngles(float theta, float phi)
   m_CameraTheta = theta;
   m_CameraPhi = phi;
 
+  // Atualiza vetores da câmera quando os ângulos são alterados
   UpdateCameraVectors();
 }
 
@@ -70,6 +72,7 @@ glm::vec4 Camera::GetRight() const
   return m_CameraRight;
 }
 
+// Computa a view matrix da câmera com base no modo de câmera atual (free ou look at)
 glm::mat4 Camera::ComputeViewMatrix() const
 {
   if (m_UseFreeCamera)
@@ -89,6 +92,7 @@ glm::mat4 Camera::ComputeViewMatrix() const
   return Matrices::MatrixCameraView(cameraPosition, viewVector, m_CameraUp);
 }
 
+// Computa a projection matrix da câmera com base no modo de exibição atual (perspectiva ou ortográfica)
 glm::mat4 Camera::ComputeProjectionMatrix() const
 {
   if (m_UsePerspective)

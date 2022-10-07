@@ -11,6 +11,7 @@ typedef std::function<void(int, int, int, int)> KeyCallbackType;
 typedef std::function<void(int, int, int)> MouseButtonCallbackType;
 typedef std::function<void(int, int)> ScrollCallbackType;
 
+// Classe para gerenciamento de inputs de teclado e mouse
 class Input
 {
 private:

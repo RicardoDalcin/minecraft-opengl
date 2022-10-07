@@ -15,6 +15,7 @@
 
 const int UI_HOTBAR_SIZE = 9;
 
+// Classe para gerenciamento e renderização da interface de usuário
 class UserInterface
 {
 private:

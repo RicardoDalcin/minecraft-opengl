@@ -5,6 +5,7 @@
 #include "IndexBuffer.hpp"
 #include "Shader.hpp"
 
+// Classe para gerenciamento de renderização da aplicação
 class Renderer
 {
 public:

@@ -4,10 +4,10 @@
 
 #include "engine/Renderer.hpp"
 
+// Classe para gerenciamento de index buffer
 IndexBuffer::IndexBuffer(const unsigned int *data, unsigned int count)
     : m_Count(count)
 {
-
   glGenBuffers(1, &m_RendererId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);

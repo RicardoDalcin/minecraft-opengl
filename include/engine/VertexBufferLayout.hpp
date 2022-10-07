@@ -36,6 +36,7 @@ struct VertexBufferElement
 	}
 };
 
+// Classe para gerenciamento do layout de vertex buffers
 class VertexBufferLayout
 {
 private:

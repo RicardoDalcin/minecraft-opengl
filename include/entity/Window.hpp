@@ -3,6 +3,7 @@
 
 #include "core.h"
 
+// Classe para gerenciamento da janela
 class Window
 {
 private:

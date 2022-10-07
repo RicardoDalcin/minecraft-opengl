@@ -5,6 +5,7 @@
 
 class VertexBufferLayout;
 
+// Classe para gerenciamento de vertex array object
 class VertexArray
 {
 private:

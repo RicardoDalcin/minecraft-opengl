@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+// Classe para gerenciamento de renderização da aplicação
+
 void GLClearError()
 {
   while (glGetError() != GL_NO_ERROR)

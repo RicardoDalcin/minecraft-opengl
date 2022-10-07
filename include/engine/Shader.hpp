@@ -12,6 +12,7 @@ struct ShaderProgramSource
   std::string FragmentSource;
 };
 
+// Classe para load, compilação e uso de shaders
 class Shader
 {
 private:

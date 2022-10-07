@@ -1,6 +1,7 @@
 #ifndef _VERTEXBUFFER_H
 #define _VERTEXBUFFER_H
 
+// Classe para gerenciamento de vertex buffer
 class VertexBuffer
 {
 private:

@@ -5,6 +5,7 @@
 
 #include "core/Matrices.hpp"
 
+// Classe para gerenciamento de câmera da aplicação
 class Camera
 {
 private:
@@ -25,6 +26,7 @@ private:
   const float m_Farplane;
   float m_FOV;
 
+  // Recalcula os vetores da câmera com base nos ângulos
   void UpdateCameraVectors()
   {
     float x = cos(m_CameraPhi) * sin(m_CameraTheta);

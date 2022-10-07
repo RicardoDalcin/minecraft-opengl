@@ -18,6 +18,7 @@
 
 const int HOTBAR_SIZE = 9;
 
+// Classe para gerenciamento do personagem
 class Character
 {
 private:

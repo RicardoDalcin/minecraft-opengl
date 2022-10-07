@@ -9,6 +9,7 @@
 #include "engine/Shader.hpp"
 #include "engine/Renderer.hpp"
 
+// Classe para load, compilação e uso de shaders
 Shader::Shader(const std::string &filepath)
     : m_RendererId(0),
       m_FilePath(filepath)
@@ -34,26 +35,26 @@ ShaderProgramSource Shader::ParseShader(const std::string &filePath)
   };
 
   std::string line;
-  std::stringstream ss[2];
+  std::stringstream stringStream[2];
 
-  ShaderType type = ShaderType::NONE;
+  ShaderType shaderType = ShaderType::NONE;
 
   while (getline(stream, line))
   {
     if (line.find("#shader") != std::string::npos)
     {
       if (line.find("vertex") != std::string::npos)
-        type = ShaderType::VERTEX;
+        shaderType = ShaderType::VERTEX;
       else if (line.find("fragment") != std::string::npos)
-        type = ShaderType::FRAGMENT;
+        shaderType = ShaderType::FRAGMENT;
     }
     else
     {
-      ss[(int)type] << line << '\n';
+      stringStream[(int)shaderType] << line << '\n';
     }
   }
 
-  return {ss[0].str(), ss[1].str()};
+  return {stringStream[0].str(), stringStream[1].str()};
 }
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string &source)

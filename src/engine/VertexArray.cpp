@@ -3,6 +3,7 @@
 #include "engine/VertexBufferLayout.hpp"
 #include "engine/Renderer.hpp"
 
+// Classe para gerenciamento de vertex array object
 VertexArray::VertexArray()
 {
   glGenVertexArrays(1, &m_RendererId);
