@@ -4,6 +4,7 @@
 #include "world/World.hpp"
 #include "world/WorldConstants.hpp"
 
+// Namespace para funções de teste de colisão
 namespace Collisions
 {
   int Sign(float x);

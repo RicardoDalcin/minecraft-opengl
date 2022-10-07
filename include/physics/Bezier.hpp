@@ -1,5 +1,6 @@
 #include "core.h"
 
+// Classe para criação e cálculo de curva de bézier cúbica
 class Bezier
 {
 private:

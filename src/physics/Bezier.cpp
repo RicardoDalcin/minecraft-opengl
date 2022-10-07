@@ -1,5 +1,6 @@
 #include "physics/Bezier.hpp"
 
+// Classe para criação e cálculo de curva de bézier cúbica
 Bezier::Bezier(glm::vec2 p0, glm::vec2 p1, glm::vec2 p2, glm::vec2 p3)
     : m_P0(p0),
       m_P1(p1),
@@ -12,6 +13,7 @@ Bezier::~Bezier()
 {
 }
 
+// Calcula o ponto na curva de bézier
 glm::vec2 Bezier::GetPoint(float pointAt)
 {
   glm::vec2 p01 = m_P0 + pointAt * (m_P1 - m_P0);
