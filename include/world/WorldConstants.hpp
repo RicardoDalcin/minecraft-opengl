@@ -1,6 +1,7 @@
 #ifndef _WORLDCONSTANTS_H
 #define _WORLDCONSTANTS_H
 
+// Constantes para geração do mundo
 namespace WorldConstants
 {
   const int CHUNK_SIZE = 16;

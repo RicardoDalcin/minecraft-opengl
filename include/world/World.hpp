@@ -9,6 +9,7 @@
 #include "world/Chunk.hpp"
 #include "world/WorldConstants.hpp"
 
+// Classe para representar o mundo
 class World
 {
 private:
@@ -19,6 +20,7 @@ private:
 
   std::vector<glm::vec2> m_ChunksToUpdate;
 
+  // Retorna os chunks vizinhos do chunk na posição passada
   std::array<Chunk *, 4> GetNeighbors(glm::vec2 position)
   {
     int x = position.x;

@@ -4,12 +4,14 @@
 #include "world/Noise.hpp"
 #include "world/WorldConstants.hpp"
 
+// Classe para geração de terreno
 class TerrainGeneration
 {
 private:
   static Noise baseNoise;
   static Noise accentNoise;
 
+  // Gera um valor de ruído para deixar o terreno em forma de ilha
   static float GetIslandHeight(glm::vec2 blockPosition, glm::vec2 chunkPosition, float islandFactor = 6.0f)
   {
     int blockX = blockPosition.x;

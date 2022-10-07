@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
 
+// Classe para geração de ruído
 class Noise
 {
 private:

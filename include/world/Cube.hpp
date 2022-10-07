@@ -5,6 +5,7 @@
 
 #include "world/BlockDatabase.hpp"
 
+// Classe para cálculo de vértices de um cubo
 struct CubeVertex
 {
   glm::vec4 position;

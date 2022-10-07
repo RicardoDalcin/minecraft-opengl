@@ -3,8 +3,6 @@
 
 #include "core.h"
 
-// #include "tiny_obj_loader/tiny_obj_loader.h"
-
 #include "engine/VertexArray.hpp"
 #include "engine/VertexBuffer.hpp"
 #include "engine/VertexBufferLayout.hpp"
@@ -13,6 +11,7 @@
 
 #include "core/matrices.hpp"
 
+// Classe para load e renderização de arquivos .obj
 class Object
 {
 private:

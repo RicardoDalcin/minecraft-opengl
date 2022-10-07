@@ -30,6 +30,7 @@ static const std::array<glm::vec4, 8> VERTEX_POSITIONS = {
     glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),
     glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)};
 
+// Retorna os vértices visíveis de um cubo
 std::vector<CubeVertex> Cube::GetVisibleVertices(int blockIndex, glm::vec3 position, std::array<glm::vec2, 36> textureCoords, std::array<bool, 6> occludedFaces)
 {
   std::vector<CubeVertex> visibleVertices;

@@ -4,8 +4,10 @@
 
 BlockInformation BlockDatabase::blockInformation[BLOCK_COUNT] = {};
 
+// Inicializa o banco de dados de blocos
 void BlockDatabase::Initialize()
 {
+  // Para cada bloco, calcula suas coordenadas de textura correpondentes ao atlas
   for (int i = 0; i < BLOCK_COUNT; i++)
   {
     BlockBaseInformation blockBase = BLOCK_ATLAS[i];
@@ -55,7 +57,7 @@ void BlockDatabase::Initialize()
     block.textureCoordinates[9] = glm::vec2(textureOneX, textureZeroY);
     block.textureCoordinates[11] = glm::vec2(textureZeroX, textureZeroY);
 
-    // back face must flip the texture
+    // Necessário "flipar" a texture da face de trás
     block.textureCoordinates[14] = glm::vec2(textureOneX, textureOneY);
     block.textureCoordinates[15] = glm::vec2(textureZeroX, textureOneY);
     block.textureCoordinates[12] = glm::vec2(textureZeroX, textureZeroY);

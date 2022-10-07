@@ -4,10 +4,12 @@
 
 #include "core/Matrices.hpp"
 
+// Inicializa o mundo
 World::World(Shader *shader)
     : m_Shader(shader),
       m_TextureAtlas(new Texture("extras/textures/atlas.png", true))
 {
+  // Adiciona os chunks na lista de atualização
   for (int x = 0; x < WorldConstants::CHUNKS_PER_AXIS; x++)
   {
     for (int z = 0; z < WorldConstants::CHUNKS_PER_AXIS; z++)
@@ -17,6 +19,7 @@ World::World(Shader *shader)
     }
   }
 
+  // Constrói as meshes dos chunks
   UpdateMeshes();
 }
 
@@ -31,6 +34,7 @@ World::~World()
   }
 }
 
+// Atualiza o mesh de um chunk
 void World::UpdateChunkMesh(glm::vec2 position)
 {
   int x = position.x;
@@ -41,6 +45,7 @@ void World::UpdateChunkMesh(glm::vec2 position)
   m_Chunks[x][z]->BuildMesh(neighbors);
 }
 
+// Atualiza a mesh dos chunks que estão na lista de atualização
 void World::UpdateMeshes()
 {
   for (auto &position : m_ChunksToUpdate)
@@ -49,6 +54,7 @@ void World::UpdateMeshes()
   m_ChunksToUpdate.clear();
 }
 
+// Desenha o mundo
 void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
 {
   m_Shader->Bind();
@@ -75,14 +81,17 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
     }
   }
 
+  // Ordena os chunks de acordo com a distância da câmera (mais longe )
   std::sort(chunks.begin(), chunks.end(), [](const std::pair<float, Chunk *> &a, const std::pair<float, Chunk *> &b)
             { return a.first > b.first; });
 
+  // Com os chunks ordenados, para cada chunk chama a função de renderização
   for (auto &chunk : chunks)
   {
     int chunkX = chunk.second->GetChunkX();
     int chunkZ = chunk.second->GetChunkZ();
 
+    // Translação para a posição do chunk
     glm::mat4 model = Matrices::MatrixTranslate(chunkX * WorldConstants::CHUNK_SIZE, 0.0f, chunkZ * WorldConstants::CHUNK_SIZE);
 
     m_Shader->SetUniformMat4f("uTransform", model);
@@ -91,6 +100,7 @@ void World::Draw(Camera *camera, glm::mat4 view, glm::mat4 projection)
   }
 }
 
+// Callback de raycast do mundo
 bool World::RayCastCallback(World *data, glm::vec4 position)
 {
   int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;
@@ -116,6 +126,7 @@ bool World::RayCastCallback(World *data, glm::vec4 position)
     return false;
   }
 
+  // Se a posição de raycast é válida, busca o chunk
   Chunk *chunk = data->m_Chunks[chunkX][chunkZ];
 
   int blockY = (int)position.y;
@@ -125,11 +136,13 @@ bool World::RayCastCallback(World *data, glm::vec4 position)
     return false;
   }
 
+  // Se o bloco na posição de raycast não é ar ou água, retorna true
   int block = chunk->GetCube(glm::vec3(blockX, blockY, blockZ));
 
   return block != AIR && block != WATER;
 }
 
+// Atualiza um bloco no mundo
 void World::SetBlock(glm::vec3 position, int block)
 {
   int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;
@@ -155,8 +168,10 @@ void World::SetBlock(glm::vec3 position, int block)
 
   chunk->SetCube(glm::vec3(blockX, blockY, blockZ), block);
 
+  // Adiciona o chunk modificado na lista de atualização
   m_ChunksToUpdate.push_back(glm::vec2(chunkX, chunkZ));
 
+  // Adiciona os chunks vizinhos na lista de atualização, se necessário
   if (blockX == 0 && chunkX - 1 >= 0)
     m_ChunksToUpdate.push_back(glm::vec2(chunkX - 1, chunkZ));
 
@@ -169,9 +184,11 @@ void World::SetBlock(glm::vec3 position, int block)
   if (blockZ == WorldConstants::CHUNK_SIZE - 1 && chunkZ + 1 < WorldConstants::CHUNKS_PER_AXIS)
     m_ChunksToUpdate.push_back(glm::vec2(chunkX, chunkZ + 1));
 
+  // Atualiza a mesh dos chunks
   UpdateMeshes();
 }
 
+// Retorna o bloco na posição especificada
 int World::GetBlock(glm::vec3 position)
 {
   int chunkX = (int)position.x / WorldConstants::CHUNK_SIZE;

@@ -1,5 +1,6 @@
 #include "world/Object.hpp"
 
+// Inicializa o objeto
 Object::Object(std::string filename, float objectX, float objectZ)
 {
   m_ObjectX = objectX;
@@ -8,6 +9,7 @@ Object::Object(std::string filename, float objectX, float objectZ)
   std::string warn;
   std::string err;
 
+  // Carrega o modelo
   bool ret = tinyobj::LoadObj(&m_Attributes, &m_Shapes, &m_Materials, &warn, &err, filename.c_str());
 
   if (!err.empty())
@@ -18,14 +20,13 @@ Object::Object(std::string filename, float objectX, float objectZ)
 
   printf("OK.\n");
 
+  // Computa as normais e constrói os vértices
   ComputeNormals();
   BuildVertices();
 }
 
 Object::~Object()
 {
-  // delete m_VAO;
-  // delete m_VBO;
 }
 
 void Object::ComputeNormals()
@@ -222,6 +223,7 @@ void Object::BuildVertices()
   glBindVertexArray(0);
 }
 
+// Desenha o modelo
 void Object::Draw(Shader *shader, glm::mat4 view, glm::mat4 projection, bool isGouraud)
 {
   shader->Bind();
@@ -237,35 +239,11 @@ void Object::Draw(Shader *shader, glm::mat4 view, glm::mat4 projection, bool isG
 
   glBindVertexArray(m_VertexArrayObjectId);
 
-  // Pedimos para a GPU rasterizar os vértices dos eixos XYZ
-  // apontados pelo VAO como linhas. Veja a definição de
-  // g_VirtualScene[""] dentro da função BuildTrianglesAndAddToVirtualScene(), e veja
-  // a documentação da função glDrawElements() em
-  // http://docs.gl/gl3/glDrawElements.
   glDrawElements(
       GL_TRIANGLES,
       m_IndexCount,
       GL_UNSIGNED_INT,
       (void *)(m_FirstIndex * sizeof(GLuint)));
 
-  // "Desligamos" o VAO, evitando assim que operações posteriores venham a
-  // alterar o mesmo. Isso evita bugs.
   glBindVertexArray(0);
-
-  // // "Ligamos" o VAO. Note que agora não precisamos mais "ligar" os buffers
-  // // (VBOs) pois eles já estão "ligados" ao VAO.
-  // glBindVertexArray(m_VertexArrayObjectId);
-
-  // // "Ligamos" o buffer de índices.
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VertexBufferObjectId);
-
-  // // Desenhamos o objeto.
-  // glDrawElements(GL_TRIANGLES, m_IndexCount, GL_UNSIGNED_INT, 0);
-
-  // // "Desligamos" o buffer de índices.
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  // // "Desligamos" o VAO, evitando assim que operações posteriores venham a
-  // // alterar o mesmo. Isso evita bugs.
-  // glBindVertexArray(0);
 }

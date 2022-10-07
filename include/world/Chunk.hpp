@@ -12,6 +12,7 @@
 #include "world/Cube.hpp"
 #include "world/WorldConstants.hpp"
 
+// Classe para representação de um chunk
 class Chunk
 {
 private:

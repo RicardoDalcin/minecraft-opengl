@@ -8,6 +8,7 @@
 #include "world/TerrainGeneration.hpp"
 #include "world/BlockDatabase.hpp"
 
+// Inicializa o chunk e gera o mundo
 Chunk::Chunk(int chunkX, int chunkZ)
     : m_ChunkX(chunkX),
       m_ChunkZ(chunkZ),
@@ -18,6 +19,7 @@ Chunk::Chunk(int chunkX, int chunkZ)
 {
   std::array<int, WorldConstants::CHUNK_SIZE * WorldConstants::CHUNK_SIZE> heightMap;
 
+  // Calcula o heightmap para cada posição horizontal do chunk
   for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
   {
     for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
@@ -26,6 +28,7 @@ Chunk::Chunk(int chunkX, int chunkZ)
     }
   }
 
+  // Gera o bloco para cada posição do chunk
   for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
   {
     for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
@@ -37,44 +40,6 @@ Chunk::Chunk(int chunkX, int chunkZ)
       }
     }
   }
-
-  // for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
-  // {
-  //   for (int z = 0; z < WorldConstants::CHUNK_SIZE; z++)
-  //   {
-  //     int height = heightMap[z * WorldConstants::CHUNK_SIZE + x];
-  //     if (height > WorldConstants::WATER_LEVEL + 3)
-  //     {
-  //       int willHaveTree = rand() % 100;
-  //       if (willHaveTree == 5)
-  //       {
-  //         int treeHeight = rand() % 3 + 4;
-  //         for (int y = 0; y < treeHeight; y++)
-  //         {
-  //           if (height + y + 1 < WorldConstants::CHUNK_HEIGHT)
-  //           {
-  //             m_Cubes[x][height + y + 1][z] = OAK_LOG;
-  //           }
-  //         }
-
-  //         for (int i = -2; i < 3; i++)
-  //         {
-  //           for (int j = -2; j < 3; j++)
-  //           {
-  //             if (i == 0 && j == 0)
-  //             {
-  //               continue;
-  //             }
-  //             if (x + i >= 0 && x + i < WorldConstants::CHUNK_SIZE && z + j >= 0 && z + j < WorldConstants::CHUNK_SIZE && height + treeHeight < WorldConstants::CHUNK_HEIGHT)
-  //             {
-  //               m_Cubes[x + i][height + treeHeight][z + j] = OAK_LEAVES;
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
 }
 
 Chunk::~Chunk()
@@ -92,6 +57,7 @@ Chunk::~Chunk()
     delete m_TransparentVBO;
 }
 
+// Constrói a mesh do chunk
 void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 {
   if (m_VAO != NULL)
@@ -111,6 +77,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
   std::vector<CubeVertex> vertices;
   std::vector<CubeVertex> transparentVertices;
 
+  // Para cada bloco do chunk
   for (int x = 0; x < WorldConstants::CHUNK_SIZE; x++)
   {
     for (int y = 0; y < WorldConstants::CHUNK_HEIGHT; y++)
@@ -130,6 +97,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
           bool hasBlockInTop = false;
           bool hasBlockInBottom = false;
 
+          // Verifica quais faces estão oclusas por blocos opacos e não devem ser renderizadas
           if (z + 1 < WorldConstants::CHUNK_SIZE)
           {
             int blockInFront = m_Cubes[x][y][z + 1];
@@ -226,8 +194,10 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
 
           BlockInformation blockInfo = BlockDatabase::GetBlockInformationIndex(cube);
 
+          // Com a oclusão calculada, gera os vértices do bloco que serão adicionados à mesh
           std::vector<CubeVertex> visibleVertices = Cube::GetVisibleVertices(cube, glm::vec3(x, y, z), blockInfo.textureCoordinates, occlusion);
 
+          // Adiciona vértices na geometria correspondente
           if (blockInfo.isOpaque)
             vertices.insert(vertices.end(), visibleVertices.begin(), visibleVertices.end());
           else
@@ -236,6 +206,8 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
       }
     }
   }
+
+  // Atualiza a geometria do chunk
 
   if (m_VBO != NULL)
     delete m_VBO;
@@ -259,6 +231,7 @@ void Chunk::BuildMesh(std::array<Chunk *, 4> neighbors)
   m_TransparentMeshVertexCount = transparentVertices.size();
 }
 
+// Desenha o chunk
 void Chunk::Draw(Shader *shader)
 {
   shader->SetUniform1i("uIsOpaque", 1);
@@ -267,6 +240,7 @@ void Chunk::Draw(Shader *shader)
 
   glDrawArrays(GL_TRIANGLES, 0, m_MeshVertexCount);
 
+  // Ativa transparência para desenhar a geometria transparente
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

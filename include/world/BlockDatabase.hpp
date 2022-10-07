@@ -6,6 +6,9 @@
 
 #include <glm/glm.hpp>
 
+// Database de blocos
+// Define cada bloco, suas propriedades (sólido, transparente, etc) e sua textura (índice de cada face no atlas)
+
 const int STONE_SIDE = 0;
 const int ANDESITE_SIDE = 1;
 const int DIRT_SIDE = 2;
